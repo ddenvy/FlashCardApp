@@ -1,7 +1,9 @@
 using FlashCardApp.Models;
 using FlashCardApp.Services;
+using System;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FlashCardApp.ViewModels
 {
@@ -35,19 +37,37 @@ namespace FlashCardApp.ViewModels
         public string Question
         {
             get => _question;
-            set => SetProperty(ref _question, value);
+            set 
+            { 
+                if (SetProperty(ref _question, value))
+                {
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
         }
 
         public string Answer
         {
             get => _answer;
-            set => SetProperty(ref _answer, value);
+            set 
+            { 
+                if (SetProperty(ref _answer, value))
+                {
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
         }
 
         public string SelectedTopic
         {
             get => _selectedTopic;
-            set => SetProperty(ref _selectedTopic, value);
+            set 
+            { 
+                if (SetProperty(ref _selectedTopic, value))
+                {
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
         }
 
         public string NewTopic
@@ -55,9 +75,13 @@ namespace FlashCardApp.ViewModels
             get => _newTopic;
             set
             {
-                if (SetProperty(ref _newTopic, value) && !string.IsNullOrWhiteSpace(value))
+                if (SetProperty(ref _newTopic, value))
                 {
-                    SelectedTopic = value;
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        SelectedTopic = value;
+                    }
+                    CommandManager.InvalidateRequerySuggested();
                 }
             }
         }
@@ -73,7 +97,12 @@ namespace FlashCardApp.ViewModels
         public RelayCommand SaveCommand { get; private set; }
         public RelayCommand CancelCommand { get; private set; }
 
-        public bool? DialogResult { get; set; }
+        private bool? _dialogResult;
+        public bool? DialogResult 
+        { 
+            get => _dialogResult;
+            set => SetProperty(ref _dialogResult, value);
+        }
 
         private void InitializeCommands()
         {
@@ -143,7 +172,7 @@ namespace FlashCardApp.ViewModels
 
         private void CloseDialog()
         {
-            // Метод для закрытия диалога будет вызван из View
+            // Закрытие происходит автоматически через DialogResult
         }
     }
 } 

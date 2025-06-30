@@ -62,6 +62,12 @@ namespace FlashCardApp.Controls
             }
             _isFlipped = !_isFlipped;
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Предотвращаем переворот карточки при нажатии на кнопки управления
+            e.Handled = true;
+        }
     }
 
     // ViewModel для отображения карточки
@@ -73,6 +79,9 @@ namespace FlashCardApp.Controls
         {
             _card = card;
         }
+
+        // Добавляем доступ к исходному объекту FlashCard
+        public FlashCard Card => _card;
 
         public string Question => _card?.Question ?? "";
         public string Answer => _card?.Answer ?? "";
