@@ -1,0 +1,116 @@
+<UserControl x:Class="FlashCardApp.Controls.FlipCardControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             MinWidth="200" MinHeight="150">
+    
+    <UserControl.Resources>
+        <Storyboard x:Key="FlipToAnswer">
+            <DoubleAnimation Storyboard.TargetName="QuestionSide" 
+                           Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                           To="0" Duration="0:0:0.2"/>
+            <DoubleAnimation Storyboard.TargetName="AnswerSide" 
+                           Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                           From="0" To="1" Duration="0:0:0.2" BeginTime="0:0:0.2"/>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="QuestionSide" 
+                                         Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="AnswerSide" 
+                                         Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+        
+        <Storyboard x:Key="FlipToQuestion">
+            <DoubleAnimation Storyboard.TargetName="AnswerSide" 
+                           Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                           To="0" Duration="0:0:0.2"/>
+            <DoubleAnimation Storyboard.TargetName="QuestionSide" 
+                           Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                           From="0" To="1" Duration="0:0:0.2" BeginTime="0:0:0.2"/>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="AnswerSide" 
+                                         Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="QuestionSide" 
+                                         Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+    </UserControl.Resources>
+    
+    <Border Background="White" BorderBrush="#E0E0E0" BorderThickness="1" 
+            CornerRadius="8" Margin="4" Cursor="Hand">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="8" ShadowDepth="2" Color="Gray" Opacity="0.3"/>
+        </Border.Effect>
+        
+        <Grid>
+            <!-- Сторона с вопросом -->
+            <Border x:Name="QuestionSide" Background="#F8F9FA" CornerRadius="8">
+                <Border.RenderTransform>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Border.RenderTransform>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Заголовок темы -->
+                    <Border Grid.Row="0" Background="{Binding TopicColor}" 
+                            CornerRadius="8,8,0,0" Padding="8,4">
+                        <TextBlock Text="{Binding Topic}" FontWeight="Bold" 
+                                   FontSize="12" Foreground="White" HorizontalAlignment="Center"/>
+                    </Border>
+                    
+                    <!-- Вопрос -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="12">
+                        <TextBlock Text="{Binding Question}" FontSize="14" 
+                                   TextWrapping="Wrap" VerticalAlignment="Center"/>
+                    </ScrollViewer>
+                    
+                    <!-- Статус -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8">
+                        <Ellipse Width="8" Height="8" Fill="{Binding StatusColor}" Margin="4,0"/>
+                        <TextBlock Text="{Binding Status}" FontSize="10" Foreground="#666"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
+            <!-- Сторона с ответом -->
+            <Border x:Name="AnswerSide" Background="#E3F2FD" CornerRadius="8" 
+                    Visibility="Hidden">
+                <Border.RenderTransform>
+                    <ScaleTransform ScaleX="0" ScaleY="1"/>
+                </Border.RenderTransform>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Заголовок -->
+                    <Border Grid.Row="0" Background="#1976D2" 
+                            CornerRadius="8,8,0,0" Padding="8,4">
+                        <TextBlock Text="ОТВЕТ" FontWeight="Bold" 
+                                   FontSize="12" Foreground="White" HorizontalAlignment="Center"/>
+                    </Border>
+                    
+                    <!-- Ответ -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="12">
+                        <TextBlock Text="{Binding Answer}" FontSize="14" 
+                                   TextWrapping="Wrap" VerticalAlignment="Center"/>
+                    </ScrollViewer>
+                    
+                    <!-- Кнопка для возврата -->
+                    <TextBlock Grid.Row="2" Text="Нажмите для возврата" 
+                               FontSize="10" Foreground="#666" HorizontalAlignment="Center" 
+                               Margin="8"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl> 

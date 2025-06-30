@@ -1,0 +1,125 @@
+<Window x:Class="FlashCardApp.Views.AddCardDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Добавить карточку" Height="500" Width="600"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+    
+    <Grid Background="#F8F9FA">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Заголовок -->
+        <Border Grid.Row="0" Background="#2196F3" Padding="16">
+            <TextBlock Text="{Binding IsEditMode, Converter={StaticResource BoolToStringConverter}, 
+                              ConverterParameter='Редактировать карточку|Добавить карточку'}" 
+                       FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+        </Border>
+        
+        <!-- Основное содержимое -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="24">
+            <StackPanel>
+                
+                <!-- Поле вопроса -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock Text="Вопрос *" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBox Text="{Binding Question, UpdateSourceTrigger=PropertyChanged}" 
+                             TextWrapping="Wrap" MinHeight="80" AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto" Padding="8"
+                             BorderBrush="#DDD" BorderThickness="1"/>
+                </StackPanel>
+                
+                <!-- Поле ответа -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock Text="Ответ *" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBox Text="{Binding Answer, UpdateSourceTrigger=PropertyChanged}" 
+                             TextWrapping="Wrap" MinHeight="100" AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto" Padding="8"
+                             BorderBrush="#DDD" BorderThickness="1"/>
+                </StackPanel>
+                
+                <!-- Выбор темы -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock Text="Тема *" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <ComboBox Grid.Column="0" 
+                                  ItemsSource="{Binding ExistingTopics}"
+                                  SelectedItem="{Binding SelectedTopic}"
+                                  IsEditable="True" 
+                                  Padding="8" Height="32"
+                                  BorderBrush="#DDD" BorderThickness="1"/>
+                        
+                        <TextBlock Grid.Column="1" Text="или создать новую →" 
+                                   VerticalAlignment="Center" Margin="8,0,0,0" 
+                                   Foreground="#666" FontSize="12"/>
+                    </Grid>
+                </StackPanel>
+                
+                <!-- Создание новой темы -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock Text="Новая тема" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBox Text="{Binding NewTopic, UpdateSourceTrigger=PropertyChanged}" 
+                             Padding="8" Height="32"
+                             BorderBrush="#DDD" BorderThickness="1"/>
+                </StackPanel>
+                
+                <!-- Предварительный просмотр -->
+                <Border Background="White" BorderBrush="#DDD" BorderThickness="1" 
+                        CornerRadius="8" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="Предварительный просмотр" FontWeight="Bold" 
+                                   Margin="0,0,0,8" Foreground="#333"/>
+                        
+                        <Border Background="#F0F0F0" CornerRadius="4" Padding="12" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="Вопрос:" FontWeight="SemiBold" FontSize="12" 
+                                           Foreground="#666"/>
+                                <TextBlock Text="{Binding Question}" TextWrapping="Wrap" 
+                                           Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Background="#E3F2FD" CornerRadius="4" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="Ответ:" FontWeight="SemiBold" FontSize="12" 
+                                           Foreground="#666"/>
+                                <TextBlock Text="{Binding Answer}" TextWrapping="Wrap" 
+                                           Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <TextBlock Text="{Binding SelectedTopic, StringFormat='Тема: {0}'}" 
+                                   FontSize="12" Foreground="#666" HorizontalAlignment="Right" 
+                                   Margin="0,8,0,0"/>
+                    </StackPanel>
+                </Border>
+                
+            </StackPanel>
+        </ScrollViewer>
+        
+        <!-- Кнопки -->
+        <Border Grid.Row="2" Background="White" BorderBrush="#E0E0E0" 
+                BorderThickness="0,1,0,0" Padding="24,16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Отмена" Command="{Binding CancelCommand}"
+                        MinWidth="80" Height="32" Margin="0,0,8,0"
+                        Background="#F5F5F5" BorderBrush="#DDD" 
+                        BorderThickness="1"/>
+                
+                <Button Content="{Binding IsEditMode, Converter={StaticResource BoolToStringConverter}, 
+                                  ConverterParameter='Сохранить|Добавить'}" 
+                        Command="{Binding SaveCommand}"
+                        MinWidth="80" Height="32"
+                        Background="#4CAF50" Foreground="White" 
+                        BorderThickness="0"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window> 

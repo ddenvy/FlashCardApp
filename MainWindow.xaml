@@ -1,0 +1,233 @@
+﻿<Window x:Class="FlashCardApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:FlashCardApp.Controls"
+        Title="FlashCard App - Изучение с карточками" 
+        Height="700" Width="1200" 
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Верхняя панель инструментов -->
+        <Border Grid.Row="0" Background="#2196F3" Padding="16,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Content="➕ Добавить карточку" 
+                            Command="{Binding AddCardCommand}"
+                            Background="#4CAF50" Foreground="White" 
+                            Padding="12,6" Margin="0,0,8,0" 
+                            BorderThickness="0"/>
+                    
+                    <Button Content="🔄 Обновить" 
+                            Command="{Binding RefreshCommand}"
+                            Background="#FF9800" Foreground="White" 
+                            Padding="12,6" Margin="0,0,8,0" 
+                            BorderThickness="0"/>
+                    
+                    <Button Content="📚 Режим обучения" 
+                            Command="{Binding StartStudyModeCommand}"
+                            CommandParameter="{Binding SelectedTopic}"
+                            Background="#9C27B0" Foreground="White" 
+                            Padding="12,6" Margin="0,0,16,0" 
+                            BorderThickness="0"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="Тема:" Foreground="White" 
+                               VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox ItemsSource="{Binding Topics}" 
+                              SelectedItem="{Binding SelectedTopic}"
+                              MinWidth="120" Margin="0,0,8,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Панель фильтров -->
+        <Border Grid.Row="1" Background="#F5F5F5" Padding="16,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Статус:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <RadioButton Content="Все" 
+                             IsChecked="{Binding IsAllStatusSelected}" 
+                             Margin="0,0,8,0"/>
+                <RadioButton Content="Новые" IsChecked="{Binding SelectedStatus, 
+                             Converter={StaticResource EnumToBooleanConverter}, 
+                             ConverterParameter=New}" Margin="0,0,8,0"/>
+                <RadioButton Content="Изучаю" IsChecked="{Binding SelectedStatus, 
+                             Converter={StaticResource EnumToBooleanConverter}, 
+                             ConverterParameter=Learning}" Margin="0,0,8,0"/>
+                <RadioButton Content="Знаю" IsChecked="{Binding SelectedStatus, 
+                             Converter={StaticResource EnumToBooleanConverter}, 
+                             ConverterParameter=Known}" Margin="0,0,8,0"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Канбан-доска -->
+        <Grid Grid.Row="2" Background="#FAFAFA">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Колонка "Новые" -->
+            <Border Grid.Column="0" Background="White" Margin="8" 
+                    BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Grid.Row="0" Background="#F44336" Padding="12,8" CornerRadius="8,8,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="🆕 НОВЫЕ" FontWeight="Bold" 
+                                       Foreground="White" FontSize="14"/>
+                            <TextBlock Text="{Binding NewCards.Count, StringFormat=' ({0})'}" 
+                                       FontWeight="Bold" Foreground="White" FontSize="14"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="8">
+                        <ItemsControl ItemsSource="{Binding NewCards}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <controls:FlipCardControl FlashCard="{Binding}" 
+                                                              Width="280" Height="160" 
+                                                              Margin="4">
+                                        <controls:FlipCardControl.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Редактировать" 
+                                                          Command="{Binding DataContext.EditCardCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          CommandParameter="{Binding}"/>
+                                                <MenuItem Header="Удалить" 
+                                                          Command="{Binding DataContext.DeleteCardCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          CommandParameter="{Binding}"/>
+                                            </ContextMenu>
+                                        </controls:FlipCardControl.ContextMenu>
+                                    </controls:FlipCardControl>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+            
+            <!-- Колонка "Изучаю" -->
+            <Border Grid.Column="1" Background="White" Margin="8" 
+                    BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Grid.Row="0" Background="#FF9800" Padding="12,8" CornerRadius="8,8,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="📖 ИЗУЧАЮ" FontWeight="Bold" 
+                                       Foreground="White" FontSize="14"/>
+                            <TextBlock Text="{Binding LearningCards.Count, StringFormat=' ({0})'}" 
+                                       FontWeight="Bold" Foreground="White" FontSize="14"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="8">
+                        <ItemsControl ItemsSource="{Binding LearningCards}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <controls:FlipCardControl FlashCard="{Binding}" 
+                                                              Width="280" Height="160" 
+                                                              Margin="4">
+                                        <controls:FlipCardControl.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Редактировать" 
+                                                          Command="{Binding DataContext.EditCardCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          CommandParameter="{Binding}"/>
+                                                <MenuItem Header="Удалить" 
+                                                          Command="{Binding DataContext.DeleteCardCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          CommandParameter="{Binding}"/>
+                                            </ContextMenu>
+                                        </controls:FlipCardControl.ContextMenu>
+                                    </controls:FlipCardControl>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+            
+            <!-- Колонка "Знаю" -->
+            <Border Grid.Column="2" Background="White" Margin="8" 
+                    BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Grid.Row="0" Background="#4CAF50" Padding="12,8" CornerRadius="8,8,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="✅ ЗНАЮ" FontWeight="Bold" 
+                                       Foreground="White" FontSize="14"/>
+                            <TextBlock Text="{Binding KnownCards.Count, StringFormat=' ({0})'}" 
+                                       FontWeight="Bold" Foreground="White" FontSize="14"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="8">
+                        <ItemsControl ItemsSource="{Binding KnownCards}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <controls:FlipCardControl FlashCard="{Binding}" 
+                                                              Width="280" Height="160" 
+                                                              Margin="4">
+                                        <controls:FlipCardControl.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Редактировать" 
+                                                          Command="{Binding DataContext.EditCardCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          CommandParameter="{Binding}"/>
+                                                <MenuItem Header="Удалить" 
+                                                          Command="{Binding DataContext.DeleteCardCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          CommandParameter="{Binding}"/>
+                                            </ContextMenu>
+                                        </controls:FlipCardControl.ContextMenu>
+                                    </controls:FlipCardControl>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
