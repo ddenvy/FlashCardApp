@@ -52,10 +52,14 @@ namespace FlashCardApp.ViewModels
             get => _selectedTopic;
             set
             {
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine($"SelectedTopic changing from '{_selectedTopic}' to '{value}'");
+#endif
                 if (SetProperty(ref _selectedTopic, value))
                 {
+#if DEBUG
                     System.Diagnostics.Debug.WriteLine($"SelectedTopic changed to '{value}', calling FilterCards()");
+#endif
                     FilterCards();
                 }
             }
@@ -109,14 +113,17 @@ namespace FlashCardApp.ViewModels
 
         private async void LoadDataAsync()
         {
+#if DEBUG
             System.Diagnostics.Debug.WriteLine("LoadDataAsync started");
-            
+#endif            
             try
             {
                 await _cardService.InitializeDatabaseAsync();
                 
                 var cards = await _cardService.GetAllCardsAsync();
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine($"Loaded {cards.Count} cards from database");
+#endif
                 
                 // Обновляем коллекции в UI потоке
                 await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -126,7 +133,9 @@ namespace FlashCardApp.ViewModels
                     {
                         AllCards.Add(card);
                     }
+#if DEBUG
                     System.Diagnostics.Debug.WriteLine($"AllCards.Count after loading: {AllCards.Count}");
+#endif
                 });
 
                 var topics = await _cardService.GetAllTopicsAsync();
@@ -136,7 +145,9 @@ namespace FlashCardApp.ViewModels
                 {
                     // Сохраняем текущую выбранную тему
                     var currentSelectedTopic = SelectedTopic;
+#if DEBUG
                     System.Diagnostics.Debug.WriteLine($"Current selected topic before update: {currentSelectedTopic}");
+#endif
                     
                     Topics.Clear();
                     Topics.Add("Все темы");
@@ -149,22 +160,30 @@ namespace FlashCardApp.ViewModels
                     if (!string.IsNullOrEmpty(currentSelectedTopic) && Topics.Contains(currentSelectedTopic))
                     {
                         SelectedTopic = currentSelectedTopic;
+#if DEBUG
                         System.Diagnostics.Debug.WriteLine($"Restored selected topic: {currentSelectedTopic}");
+#endif
                     }
                     else
                     {
                         SelectedTopic = "Все темы";
+#if DEBUG
                         System.Diagnostics.Debug.WriteLine("Selected topic reset to 'Все темы'");
+#endif
                     }
                 });
 
                 // Обновляем группированные коллекции
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine("Calling UpdateGroupedCards from LoadDataAsync");
+#endif
                 UpdateGroupedCards();
             }
             catch (Exception ex)
             {
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine($"Error in LoadDataAsync: {ex.Message}");
+#endif
             }
         }
 
@@ -190,8 +209,10 @@ namespace FlashCardApp.ViewModels
         {
             var filteredCards = AllCards.Where(FilterCard).ToList();
             
+#if DEBUG
             // Отладочная информация
             System.Diagnostics.Debug.WriteLine($"UpdateGroupedCards: AllCards.Count = {AllCards.Count}, FilteredCards.Count = {filteredCards.Count}");
+#endif
 
             // Обновляем коллекцию новых карточек
             _newCards.Clear();
@@ -199,7 +220,9 @@ namespace FlashCardApp.ViewModels
             {
                 _newCards.Add(card);
             }
+#if DEBUG
             System.Diagnostics.Debug.WriteLine($"NewCards after update: {_newCards.Count}");
+#endif
 
             // Обновляем коллекцию изучаемых карточек
             _learningCards.Clear();
@@ -207,7 +230,9 @@ namespace FlashCardApp.ViewModels
             {
                 _learningCards.Add(card);
             }
+#if DEBUG
             System.Diagnostics.Debug.WriteLine($"LearningCards after update: {_learningCards.Count}");
+#endif
 
             // Обновляем коллекцию изученных карточек
             _knownCards.Clear();
@@ -215,7 +240,9 @@ namespace FlashCardApp.ViewModels
             {
                 _knownCards.Add(card);
             }
+#if DEBUG
             System.Diagnostics.Debug.WriteLine($"KnownCards after update: {_knownCards.Count}");
+#endif
         }
 
         private bool FilterCard(FlashCard card)
@@ -257,7 +284,9 @@ namespace FlashCardApp.ViewModels
         {
             if (card == null) return;
 
-            System.Diagnostics.Debug.WriteLine($"DeleteCard called for card: {card.Question}");
+            #if DEBUG
+                System.Diagnostics.Debug.WriteLine($"DeleteCard called for card: {card.Question}");
+#endif
 
             var result = MessageBox.Show(
                 $"Удалить карточку?\n\nВопрос: {card.Question}",
@@ -269,15 +298,21 @@ namespace FlashCardApp.ViewModels
             {
                 try
                 {
+#if DEBUG
                     System.Diagnostics.Debug.WriteLine($"Deleting card with ID: {card.Id}");
+#endif
                     await _cardService.DeleteCardAsync(card.Id);
+#if DEBUG
                     System.Diagnostics.Debug.WriteLine("Card deleted from database, calling LoadDataAsync...");
+#endif
                     LoadDataAsync();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Ошибка при удалении карточки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+#if DEBUG
                     System.Diagnostics.Debug.WriteLine($"Error deleting card: {ex.Message}");
+#endif
                 }
             }
         }

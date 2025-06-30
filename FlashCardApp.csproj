@@ -8,6 +8,15 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>assets\icon.ico</ApplicationIcon>
     <Win32Resource />
+    
+    <!-- Информация о версии -->
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.1.0</Version>
+    <Product>FlashCard App</Product>
+    <Company>FlashCard App Team</Company>
+    <Copyright>© 2024 FlashCard App Team</Copyright>
+    <Description>Приложение для изучения с флэш-карточками</Description>
   </PropertyGroup>
 
   <ItemGroup>

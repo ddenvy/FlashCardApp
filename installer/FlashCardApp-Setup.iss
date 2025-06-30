@@ -2,8 +2,8 @@
 ; Основные настройки приложения
 AppId={{B4C8F4A2-4F2E-4B3D-8A7C-1E9F5D3A2C4B}
 AppName=FlashCard App
-AppVersion=1.0.0
-AppVerName=FlashCard App 1.0.0
+AppVersion=1.1.0
+AppVerName=FlashCard App 1.1.0
 AppPublisher=FlashCard App Team
 AppPublisherURL=https://github.com/ddenvy/FlashCardApp
 AppSupportURL=https://github.com/ddenvy/FlashCardApp/issues
@@ -14,7 +14,7 @@ AllowNoIcons=yes
 LicenseFile=..\LICENSE.txt
 InfoBeforeFile=..\README.md
 OutputDir=..\dist
-OutputBaseFilename=FlashCardApp-Setup-v1.0.0
+OutputBaseFilename=FlashCardApp-Setup-v1.1.0
 SetupIconFile=..\assets\icon.ico
 UninstallDisplayIcon={app}\icon.ico
 Compression=lzma
@@ -34,9 +34,11 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 
 ; Файлы для установки
 [Files]
-Source: "..\publish\FlashCardApp.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Все файлы приложения из папки publish
+Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Исключаем PDB файлы из release сборки (они не нужны пользователям)
 Source: "..\publish\FlashCardApp.pdb"; DestDir: "{app}"; Flags: ignoreversion; Check: IsDebugMode
-Source: "..\assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+; Дополнительные файлы
 Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
@@ -55,7 +57,7 @@ Filename: "{app}\FlashCardApp.exe"; Description: "{cm:LaunchProgram,FlashCard Ap
 ; Регистрация в системе
 [Registry]
 Root: HKLM; Subkey: "SOFTWARE\FlashCardApp"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"
-Root: HKLM; Subkey: "SOFTWARE\FlashCardApp"; ValueType: string; ValueName: "Version"; ValueData: "1.0.0"
+Root: HKLM; Subkey: "SOFTWARE\FlashCardApp"; ValueType: string; ValueName: "Version"; ValueData: "1.1.0"
 
 ; Код для проверки режима отладки
 [Code]
@@ -69,8 +71,11 @@ procedure InitializeWizard;
 begin
   WizardForm.WelcomeLabel1.Caption := 'Добро пожаловать в мастер установки FlashCard App';
   WizardForm.WelcomeLabel2.Caption := 'Приложение для изучения с флэш-карточками' + #13#13 +
-    'Это приложение поможет вам эффективно изучать различные темы ' +
-    'с помощью интерактивных карточек и канбан-доски.' + #13#13 +
+    'Версия 1.1.0 включает важные улучшения:' + #13 +
+    '• Исправлена работа кнопок добавления и удаления карточек' + #13 +
+    '• Добавлены удобные кнопки управления прямо на карточках' + #13 +
+    '• Улучшена стабильность и производительность' + #13 +
+    '• Исправлены проблемы с фильтрацией по темам' + #13#13 +
     'Нажмите "Далее" для продолжения или "Отмена" для выхода из программы установки.';
 end;
 
