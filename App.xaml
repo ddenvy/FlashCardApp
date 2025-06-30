@@ -2,12 +2,14 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:FlashCardApp"
+             xmlns:services="clr-namespace:FlashCardApp.Services"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <!-- Конвертеры -->
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <local:BoolToStringConverter x:Key="BoolToStringConverter"/>
         <local:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
+        <services:LocalizationConverter x:Key="LocalizationConverter"/>
         
         <!-- Глобальные стили -->
         <Style TargetType="Button">

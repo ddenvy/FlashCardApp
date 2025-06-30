@@ -12,10 +12,12 @@ namespace FlashCardApp.ViewModels
     public class MainWindowViewModel : BaseViewModel
     {
         private readonly CardService _cardService;
+        private readonly LocalizationService _localizationService;
         private ObservableCollection<FlashCard> _allCards;
         private ObservableCollection<string> _topics;
-        private string _selectedTopic = "Все темы";
+        private string _selectedTopic = "All";
         private CardStatus? _selectedStatus = null;
+        private string _currentLanguage;
         
         // Отдельные коллекции для каждого статуса карточек
         private ObservableCollection<FlashCard> _newCards;
@@ -25,11 +27,16 @@ namespace FlashCardApp.ViewModels
         public MainWindowViewModel()
         {
             _cardService = new CardService();
+            _localizationService = LocalizationService.Instance;
             _allCards = new ObservableCollection<FlashCard>();
             _topics = new ObservableCollection<string>();
             _newCards = new ObservableCollection<FlashCard>();
             _learningCards = new ObservableCollection<FlashCard>();
             _knownCards = new ObservableCollection<FlashCard>();
+            
+            // Инициализация языка
+            _currentLanguage = _localizationService.CurrentCulture.Name;
+            _localizationService.LanguageChanged += OnLanguageChanged;
             
             InitializeCommands();
             LoadDataAsync();
@@ -86,6 +93,18 @@ namespace FlashCardApp.ViewModels
                 if (value)
                 {
                     SelectedStatus = null;
+                }
+            }
+        }
+
+        public string CurrentLanguage
+        {
+            get => _currentLanguage;
+            set
+            {
+                if (SetProperty(ref _currentLanguage, value))
+                {
+                    _localizationService.SetLanguage(value);
                 }
             }
         }
@@ -150,7 +169,8 @@ namespace FlashCardApp.ViewModels
 #endif
                     
                     Topics.Clear();
-                    Topics.Add("Все темы");
+                    var allTopicsString = _localizationService.GetString("All");
+                    Topics.Add(allTopicsString);
                     foreach (var topic in topics)
                     {
                         Topics.Add(topic);
@@ -166,9 +186,9 @@ namespace FlashCardApp.ViewModels
                     }
                     else
                     {
-                        SelectedTopic = "Все темы";
+                        SelectedTopic = allTopicsString;
 #if DEBUG
-                        System.Diagnostics.Debug.WriteLine("Selected topic reset to 'Все темы'");
+                        System.Diagnostics.Debug.WriteLine($"Selected topic reset to '{allTopicsString}'");
 #endif
                     }
                 });
@@ -247,7 +267,8 @@ namespace FlashCardApp.ViewModels
 
         private bool FilterCard(FlashCard card)
         {
-            bool topicMatch = SelectedTopic == "Все темы" || card.Topic == SelectedTopic;
+            var allTopicsString = _localizationService.GetString("All");
+            bool topicMatch = SelectedTopic == allTopicsString || card.Topic == SelectedTopic;
             bool statusMatch = SelectedStatus == null || card.Status == SelectedStatus;
             
             return topicMatch && statusMatch;
@@ -272,7 +293,7 @@ namespace FlashCardApp.ViewModels
             var dialog = new AddCardDialog();
             var viewModel = new AddCardDialogViewModel(_cardService, card);
             dialog.DataContext = viewModel;
-            dialog.Title = "Редактировать карточку";
+            dialog.Title = _localizationService.GetString("EditCard");
             
             if (dialog.ShowDialog() == true)
             {
@@ -289,8 +310,8 @@ namespace FlashCardApp.ViewModels
 #endif
 
             var result = MessageBox.Show(
-                $"Удалить карточку?\n\nВопрос: {card.Question}",
-                "Подтверждение удаления",
+                string.Format(_localizationService.GetString("DeleteConfirmation"), card.Question),
+                _localizationService.GetString("DeleteConfirmationTitle"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
 
@@ -309,7 +330,11 @@ namespace FlashCardApp.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при удалении карточки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(
+                        string.Format(_localizationService.GetString("DeleteError"), ex.Message), 
+                        _localizationService.GetString("Error"), 
+                        MessageBoxButton.OK, 
+                        MessageBoxImage.Error);
 #if DEBUG
                     System.Diagnostics.Debug.WriteLine($"Error deleting card: {ex.Message}");
 #endif
@@ -325,6 +350,56 @@ namespace FlashCardApp.ViewModels
             studyWindow.Show();
         }
 
+        private void OnLanguageChanged()
+        {
+            // Обновляем текущий язык
+            SetProperty(ref _currentLanguage, _localizationService.CurrentCulture.Name, nameof(CurrentLanguage));
+            
+            // Обновляем строку "All" в соответствии с новым языком
+            var allTopicsString = _localizationService.GetString("All");
+            
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                // Сохраняем выбранную тему, если она не "All"
+                var currentSelectedTopic = SelectedTopic;
+                var isAllTopicsSelected = (currentSelectedTopic == "Все темы" || 
+                                         currentSelectedTopic == "All" || 
+                                         currentSelectedTopic == "全部");
+                
+                // Получаем все темы кроме локализованных версий "All"
+                var topics = Topics.Where(t => t != "Все темы" && t != "All" && t != "全部").ToList();
+                
+                // Обновляем список тем
+                Topics.Clear();
+                Topics.Add(allTopicsString);
+                foreach (var topic in topics)
+                {
+                    Topics.Add(topic);
+                }
+                
+                // Восстанавливаем выбранную тему
+                if (isAllTopicsSelected)
+                {
+                    SelectedTopic = allTopicsString;
+                }
+                else if (Topics.Contains(currentSelectedTopic))
+                {
+                    SelectedTopic = currentSelectedTopic;
+                }
+                else
+                {
+                    SelectedTopic = allTopicsString;
+                }
+            });
+        }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _localizationService.LanguageChanged -= OnLanguageChanged;
+            }
+            base.Dispose(disposing);
+        }
     }
 } 

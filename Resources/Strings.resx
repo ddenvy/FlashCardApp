@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="xml:space" use="required" type="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- Основное окно -->
+  <data name="MainWindow_Title" xml:space="preserve">
+    <value>FlashCard App - Изучение с карточками</value>
+  </data>
+  <data name="AddCard" xml:space="preserve">
+    <value>➕ Добавить карточку</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>🔄 Обновить</value>
+  </data>
+  <data name="StudyMode" xml:space="preserve">
+    <value>📚 Режим обучения</value>
+  </data>
+  <data name="Topic" xml:space="preserve">
+    <value>Тема:</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Статус:</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="New" xml:space="preserve">
+    <value>Новые</value>
+  </data>
+  <data name="Learning" xml:space="preserve">
+    <value>Изучаю</value>
+  </data>
+  <data name="Known" xml:space="preserve">
+    <value>Знаю</value>
+  </data>
+  <data name="NewCards" xml:space="preserve">
+    <value>🆕 НОВЫЕ</value>
+  </data>
+  <data name="LearningCards" xml:space="preserve">
+    <value>📖 ИЗУЧАЮ</value>
+  </data>
+  <data name="KnownCards" xml:space="preserve">
+    <value>✅ ЗНАЮ</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Редактировать</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Язык:</value>
+  </data>
+  
+  <!-- Диалог добавления карточки -->
+  <data name="AddCardDialog_Title" xml:space="preserve">
+    <value>Добавить карточку</value>
+  </data>
+  <data name="EditCardDialog_Title" xml:space="preserve">
+    <value>Редактировать карточку</value>
+  </data>
+  <data name="Question" xml:space="preserve">
+    <value>Вопрос *</value>
+  </data>
+  <data name="Answer" xml:space="preserve">
+    <value>Ответ *</value>
+  </data>
+  <data name="TopicRequired" xml:space="preserve">
+    <value>Тема *</value>
+  </data>
+  <data name="OrCreateNew" xml:space="preserve">
+    <value>или создать новую →</value>
+  </data>
+  <data name="NewTopic" xml:space="preserve">
+    <value>Новая тема</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Предварительный просмотр</value>
+  </data>
+  <data name="QuestionLabel" xml:space="preserve">
+    <value>Вопрос:</value>
+  </data>
+  <data name="AnswerLabel" xml:space="preserve">
+    <value>Ответ:</value>
+  </data>
+  <data name="TopicLabel" xml:space="preserve">
+    <value>Тема: {0}</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  
+  <!-- Режим обучения -->
+  <data name="StudyModeWindow_Title" xml:space="preserve">
+    <value>Режим обучения</value>
+  </data>
+  <data name="StudyModeHeader" xml:space="preserve">
+    <value>📚 Режим обучения</value>
+  </data>
+  <data name="TopicFormat" xml:space="preserve">
+    <value>Тема: {0}</value>
+  </data>
+  <data name="QuestionHeader" xml:space="preserve">
+    <value>ВОПРОС</value>
+  </data>
+  <data name="AnswerHeader" xml:space="preserve">
+    <value>ОТВЕТ</value>
+  </data>
+  <data name="RateKnowledge" xml:space="preserve">
+    <value>Оцените свои знания</value>
+  </data>
+  <data name="ClickToShowAnswer" xml:space="preserve">
+    <value>Нажмите для показа ответа</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>⏮️ Предыдущая</value>
+  </data>
+  <data name="RestartStudy" xml:space="preserve">
+    <value>🔄 Начать сначала</value>
+  </data>
+  <data name="ShowAnswer" xml:space="preserve">
+    <value>👁️ Показать ответ</value>
+  </data>
+  <data name="DontKnow" xml:space="preserve">
+    <value>❌ Не знаю</value>
+  </data>
+  <data name="Know" xml:space="preserve">
+    <value>✅ Знаю</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Следующая ⏭️</value>
+  </data>
+  <data name="NoCardsToStudy" xml:space="preserve">
+    <value>Нет карточек для изучения</value>
+  </data>
+  <data name="AddCardsOrSelectTopic" xml:space="preserve">
+    <value>Добавьте карточки или выберите другую тему</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="DeleteConfirmation" xml:space="preserve">
+    <value>Удалить карточку?
+
+Вопрос: {0}</value>
+  </data>
+  <data name="DeleteConfirmationTitle" xml:space="preserve">
+    <value>Подтверждение удаления</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="DeleteError" xml:space="preserve">
+    <value>Ошибка при удалении карточки: {0}</value>
+  </data>
+  <data name="EditCard" xml:space="preserve">
+    <value>Редактировать карточку</value>
+  </data>
+</root> 

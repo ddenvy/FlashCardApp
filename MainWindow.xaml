@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:FlashCardApp.Controls"
-        Title="FlashCard App - Изучение с карточками" 
+        xmlns:services="clr-namespace:FlashCardApp.Services"
+        Title="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=MainWindow_Title}" 
         Height="700" Width="1200" 
         WindowStartupLocation="CenterScreen">
     
@@ -22,19 +23,19 @@
                 </Grid.ColumnDefinitions>
                 
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <Button Content="➕ Добавить карточку" 
+                    <Button Content="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=AddCard}" 
                             Command="{Binding AddCardCommand}"
                             Background="#4CAF50" Foreground="White" 
                             Padding="12,6" Margin="0,0,8,0" 
                             BorderThickness="0"/>
                     
-                    <Button Content="🔄 Обновить" 
+                    <Button Content="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Refresh}" 
                             Command="{Binding RefreshCommand}"
                             Background="#FF9800" Foreground="White" 
                             Padding="12,6" Margin="0,0,8,0" 
                             BorderThickness="0"/>
                     
-                    <Button Content="📚 Режим обучения" 
+                    <Button Content="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=StudyMode}" 
                             Command="{Binding StartStudyModeCommand}"
                             CommandParameter="{Binding SelectedTopic}"
                             Background="#9C27B0" Foreground="White" 
@@ -43,8 +44,16 @@
                 </StackPanel>
                 
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <TextBlock Text="Тема:" Foreground="White" 
-                               VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <TextBlock Text="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Language}" 
+                               Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox ItemsSource="{Binding AvailableLanguages, Source={x:Static services:LocalizationService.Instance}}" 
+                              SelectedValue="{Binding CurrentLanguage}"
+                              SelectedValuePath="Code"
+                              DisplayMemberPath="NativeName"
+                              MinWidth="100" Margin="0,0,16,0"/>
+                    
+                    <TextBlock Text="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Topic}" 
+                               Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0"/>
                     <ComboBox ItemsSource="{Binding Topics}" 
                               SelectedItem="{Binding SelectedTopic}"
                               MinWidth="120" Margin="0,0,8,0"/>
@@ -55,17 +64,21 @@
         <!-- Панель фильтров -->
         <Border Grid.Row="1" Background="#F5F5F5" Padding="16,8">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Статус:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                <RadioButton Content="Все" 
+                <TextBlock Text="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Status}" 
+                           VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <RadioButton Content="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=All}" 
                              IsChecked="{Binding IsAllStatusSelected}" 
                              Margin="0,0,8,0"/>
-                <RadioButton Content="Новые" IsChecked="{Binding SelectedStatus, 
+                <RadioButton Content="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=New}" 
+                             IsChecked="{Binding SelectedStatus, 
                              Converter={StaticResource EnumToBooleanConverter}, 
                              ConverterParameter=New}" Margin="0,0,8,0"/>
-                <RadioButton Content="Изучаю" IsChecked="{Binding SelectedStatus, 
+                <RadioButton Content="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Learning}" 
+                             IsChecked="{Binding SelectedStatus, 
                              Converter={StaticResource EnumToBooleanConverter}, 
                              ConverterParameter=Learning}" Margin="0,0,8,0"/>
-                <RadioButton Content="Знаю" IsChecked="{Binding SelectedStatus, 
+                <RadioButton Content="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Known}" 
+                             IsChecked="{Binding SelectedStatus, 
                              Converter={StaticResource EnumToBooleanConverter}, 
                              ConverterParameter=Known}" Margin="0,0,8,0"/>
             </StackPanel>
@@ -90,8 +103,8 @@
                     
                     <Border Grid.Row="0" Background="#F44336" Padding="12,8" CornerRadius="8,8,0,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="🆕 НОВЫЕ" FontWeight="Bold" 
-                                       Foreground="White" FontSize="14"/>
+                            <TextBlock Text="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=NewCards}" 
+                                       FontWeight="Bold" Foreground="White" FontSize="14"/>
                             <TextBlock Text="{Binding NewCards.Count, StringFormat=' ({0})'}" 
                                        FontWeight="Bold" Foreground="White" FontSize="14"/>
                         </StackPanel>
@@ -111,11 +124,11 @@
                                                               Margin="4">
                                         <controls:FlipCardControl.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Header="Редактировать" 
+                                                <MenuItem Header="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Edit}" 
                                                           Command="{Binding DataContext.EditCardCommand, 
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                           CommandParameter="{Binding}"/>
-                                                <MenuItem Header="Удалить" 
+                                                <MenuItem Header="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Delete}" 
                                                           Command="{Binding DataContext.DeleteCardCommand, 
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                           CommandParameter="{Binding}"/>
@@ -140,8 +153,8 @@
                     
                     <Border Grid.Row="0" Background="#FF9800" Padding="12,8" CornerRadius="8,8,0,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="📖 ИЗУЧАЮ" FontWeight="Bold" 
-                                       Foreground="White" FontSize="14"/>
+                            <TextBlock Text="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=LearningCards}" 
+                                       FontWeight="Bold" Foreground="White" FontSize="14"/>
                             <TextBlock Text="{Binding LearningCards.Count, StringFormat=' ({0})'}" 
                                        FontWeight="Bold" Foreground="White" FontSize="14"/>
                         </StackPanel>
@@ -161,11 +174,11 @@
                                                               Margin="4">
                                         <controls:FlipCardControl.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Header="Редактировать" 
+                                                <MenuItem Header="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Edit}" 
                                                           Command="{Binding DataContext.EditCardCommand, 
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                           CommandParameter="{Binding}"/>
-                                                <MenuItem Header="Удалить" 
+                                                <MenuItem Header="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Delete}" 
                                                           Command="{Binding DataContext.DeleteCardCommand, 
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                           CommandParameter="{Binding}"/>
@@ -190,8 +203,8 @@
                     
                     <Border Grid.Row="0" Background="#4CAF50" Padding="12,8" CornerRadius="8,8,0,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="✅ ЗНАЮ" FontWeight="Bold" 
-                                       Foreground="White" FontSize="14"/>
+                            <TextBlock Text="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=KnownCards}" 
+                                       FontWeight="Bold" Foreground="White" FontSize="14"/>
                             <TextBlock Text="{Binding KnownCards.Count, StringFormat=' ({0})'}" 
                                        FontWeight="Bold" Foreground="White" FontSize="14"/>
                         </StackPanel>
@@ -211,11 +224,11 @@
                                                               Margin="4">
                                         <controls:FlipCardControl.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Header="Редактировать" 
+                                                <MenuItem Header="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Edit}" 
                                                           Command="{Binding DataContext.EditCardCommand, 
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                           CommandParameter="{Binding}"/>
-                                                <MenuItem Header="Удалить" 
+                                                <MenuItem Header="{Binding CurrentCulture, Source={x:Static services:LocalizationService.Instance}, Converter={StaticResource LocalizationConverter}, ConverterParameter=Delete}" 
                                                           Command="{Binding DataContext.DeleteCardCommand, 
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                           CommandParameter="{Binding}"/>

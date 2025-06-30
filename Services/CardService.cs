@@ -13,39 +13,7 @@ namespace FlashCardApp.Services
             using var context = new FlashCardContext();
             await context.Database.EnsureCreatedAsync();
             
-            // Добавляем примеры карточек при первом запуске
-            if (!await context.FlashCards.AnyAsync())
-            {
-                await SeedDataAsync(context);
-            }
-        }
-
-        private async Task SeedDataAsync(FlashCardContext context)
-        {
-            var sampleCards = new List<FlashCard>
-            {
-                new FlashCard
-                {
-                    Question = "Что такое класс в C#?",
-                    Answer = "Класс - это шаблон для создания объектов, который определяет свойства и методы.",
-                    Topic = "C#"
-                },
-                new FlashCard
-                {
-                    Question = "Что такое SELECT в SQL?",
-                    Answer = "SELECT - это команда SQL для извлечения данных из одной или нескольких таблиц.",
-                    Topic = "SQL"
-                },
-                new FlashCard
-                {
-                    Question = "Что такое MVC в ASP.NET?",
-                    Answer = "MVC (Model-View-Controller) - это архитектурный паттерн для разделения логики приложения.",
-                    Topic = "ASP.NET"
-                }
-            };
-
-            context.FlashCards.AddRange(sampleCards);
-            await context.SaveChangesAsync();
+            // База данных создается пустой - пользователь может добавить свои карточки
         }
 
         public async Task<List<FlashCard>> GetAllCardsAsync()
