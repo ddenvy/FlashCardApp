@@ -1,40 +1,48 @@
-# QuickMind v2.1.1 Release Notes
+# QuickMind v2.1.1 Исправления и улучшения
 
-**Release Date:** December 19, 2024
+## Что исправлено
 
-## 🐛 Bug Fixes
+### 🔧 Исправление иконки в панели задач
+- **Встроенная иконка**: Теперь иконка QuickMind правильно отображается в панели задач Windows
+- **Настройка проекта**: Добавлен параметр `ApplicationIcon` в файл проекта
+- **Единообразие**: Иконка теперь везде одинаковая - в окне приложения, панели задач и ярлыках
 
-### Language Selection Improvements
-- **Fixed initial language display**: The language selection window now always displays in English on first launch, ensuring consistent user experience
-- **Improved language initialization logic**: Removed dependency on system locale for initial language setup
-- **Better language persistence**: Subsequent launches now properly respect the user's previously selected language
-- **Fixed card button localization**: Edit and Delete buttons in flashcards now properly display in the selected language instead of always showing in English
+### 🌐 Исправление локализации
+- **Кнопки карточек**: Исправлено отображение кнопок "Редактировать" и "Удалить" - теперь они корректно переводятся на выбранный язык
+- **Язык по умолчанию**: При первом запуске приложение всегда запускается на английском языке, независимо от системных настроек
+- **Сохранение выбора**: Выбранный язык сохраняется и применяется при следующих запусках
 
-## 📝 Technical Changes
+### 🎨 Улучшения ярлыков
+- **Упрощение**: Убраны лишние настройки иконок из установщика для лучшей совместимости
+- **Чистота кода**: Удалены все комментарии из исходного кода - теперь код самодокументирующийся
 
-- Refactored `LocalizationService` constructor to ensure English is always the default language on first run
-- Removed system culture dependency that could cause inconsistent initial language display
-- Improved language loading and saving logic for better reliability
-- Updated card templates in `MainWindow.axaml` to use proper data binding for Edit/Delete button labels
+## Технические детали
 
-## 🚀 Installation
+- **Версия**: 2.1.1
+- **Размер установщика**: 34.15 MB
+- **Совместимость**: Windows 10/11 (64-bit)
+- **Зависимости**: .NET 9.0 (включен в установщик)
 
-### Windows
-- **Installer**: `QuickMind-Setup-v2.1.1.exe` (32.56 MB)
+## Скачать
 
-### macOS  
-- **Archive**: `QuickMind-macOS-ARM64-v2.1.0.zip` (44.83 MB)
-- *Note: macOS version number will be updated in the next release*
+- **Windows**: [QuickMind-Setup-v2.1.1.exe](./QuickMind-Setup-v2.1.1.exe) (34.15 MB)
+- **macOS**: [QuickMind-macOS-ARM64-v2.1.0.zip](./QuickMind-macOS-ARM64-v2.1.0.zip) (45 MB)
 
-## 🔄 Upgrade Notes
+## Особенности
 
-This is a minor patch release that improves the language selection experience. All existing data and settings will be preserved during the upgrade.
+### Изучение флеш-карт
+- Добавляйте карты с вопросами и ответами
+- Изучайте в интерактивном режиме
+- Система прогресса: Новые → Изучаемые → Изученные
 
-## 🏷️ Previous Versions
+### Многоязычность
+- Поддержка языков: English, Русский, 中文
+- Мгновенное переключение языков
+- Локализация всех элементов интерфейса
 
-- **v2.1.0**: Initial dark theme release with comprehensive UI redesign
-- **v1.x**: Legacy versions with original UI
+### Современный дизайн
+- Темная тема для комфортного обучения
+- Шрифт Corus для лучшей читаемости
+- Минималистичный и понятный интерфейс
 
----
-
-**Download the latest version from the [main README](../README.md)** 
+**Предыдущая версия**: [v2.1.0](./RELEASE-NOTES-v2.1.0.md) 

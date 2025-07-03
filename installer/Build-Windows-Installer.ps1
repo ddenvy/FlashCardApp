@@ -1,6 +1,6 @@
 # Build Windows Installer for QuickMind
 param(
-    [string]$Version = "2.0.0",
+    [string]$Version = "2.1.1",
     [string]$Configuration = "Release"
 )
 
@@ -13,7 +13,7 @@ if (Test-Path ".\dist\QuickMind-Setup-v$Version.exe") { Remove-Item ".\dist\Quic
 
 # Build and publish for Windows x64
 Write-Host "Publishing application for Windows x64..." -ForegroundColor Yellow
-dotnet publish -c $Configuration -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ".\publish\win-x64"
+dotnet publish ..\QuickMind.csproj -c $Configuration -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "..\publish\win-x64"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Build failed!" -ForegroundColor Red
@@ -77,17 +77,17 @@ Name: "{autodesktop}\QuickMind"; Filename: "{app}\QuickMind.exe"; Tasks: desktop
 Filename: "{app}\QuickMind.exe"; Description: "{cm:LaunchProgram,QuickMind}"; Flags: nowait postinstall skipifsilent
 "@
 
-$InnoScript | Out-File -FilePath ".\installer\QuickMind-Setup.iss" -Encoding UTF8
+$InnoScript | Out-File -FilePath ".\QuickMind-Setup.iss" -Encoding UTF8
 
 # Build installer
 Write-Host "Building installer..." -ForegroundColor Yellow
-& $InnoSetupPath ".\installer\QuickMind-Setup.iss"
+& $InnoSetupPath ".\QuickMind-Setup.iss"
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "✅ Windows installer created successfully: .\dist\QuickMind-Setup-v$Version.exe" -ForegroundColor Green
     
     # Display file info
-    $installerFile = Get-Item ".\dist\QuickMind-Setup-v$Version.exe"
+    $installerFile = Get-Item "..\dist\QuickMind-Setup-v$Version.exe"
     Write-Host "File size: $([math]::Round($installerFile.Length / 1MB, 2)) MB" -ForegroundColor Cyan
 } else {
     Write-Host "❌ Installer build failed!" -ForegroundColor Red
