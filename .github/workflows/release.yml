@@ -11,6 +11,10 @@ on:
         required: true
         default: '2.1.0'
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -245,10 +249,12 @@ jobs:
       run: find . -type f -name "*.exe" -o -name "*.dmg" | head -20
     
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: v${{ steps.get_version.outputs.VERSION }}
         name: QuickMind v${{ steps.get_version.outputs.VERSION }}
+        make_latest: true
+        generate_release_notes: false
         body: |
           ## QuickMind v${{ steps.get_version.outputs.VERSION }}
           
@@ -305,5 +311,5 @@ jobs:
           QuickMind-osx-arm64-v${{ steps.get_version.outputs.VERSION }}/QuickMind-osx-arm64-v${{ steps.get_version.outputs.VERSION }}.dmg
         draft: false
         prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        fail_on_unmatched_files: false
+        token: ${{ secrets.GITHUB_TOKEN }} 

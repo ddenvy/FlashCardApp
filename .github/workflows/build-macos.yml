@@ -13,6 +13,10 @@ on:
         required: true
         default: '2.1.0'
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-macos:
     runs-on: macos-latest
@@ -192,56 +196,4 @@ jobs:
         name: QuickMind-${{ matrix.arch }}-app
         path: ./dist/QuickMind-${{ matrix.arch }}.app/
 
-  create-release:
-    needs: build-macos
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Get version
-      id: get_version
-      run: |
-        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-        elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
-          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-        else
-          echo "VERSION=2.1.0-dev" >> $GITHUB_OUTPUT
-        fi
-    
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-    
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: v${{ steps.get_version.outputs.VERSION }}
-        name: QuickMind v${{ steps.get_version.outputs.VERSION }}
-        body: |
-          ## QuickMind v${{ steps.get_version.outputs.VERSION }}
-          
-          ### macOS Downloads
-          - **Intel Macs**: QuickMind-osx-x64-v${{ steps.get_version.outputs.VERSION }}.dmg
-          - **Apple Silicon Macs**: QuickMind-osx-arm64-v${{ steps.get_version.outputs.VERSION }}.dmg
-          
-          ### Installation Instructions
-          1. Download the appropriate DMG file for your Mac
-          2. Open the DMG file
-          3. Drag QuickMind.app to your Applications folder
-          4. Launch QuickMind from Applications
-          
-          ### System Requirements
-          - macOS 11.0 (Big Sur) or later
-          - 50 MB free disk space
-          
-          Built with .NET 9.0 and Avalonia UI.
-        files: |
-          QuickMind-osx-x64-v${{ steps.get_version.outputs.VERSION }}/QuickMind-osx-x64-v${{ steps.get_version.outputs.VERSION }}.dmg
-          QuickMind-osx-arm64-v${{ steps.get_version.outputs.VERSION }}/QuickMind-osx-arm64-v${{ steps.get_version.outputs.VERSION }}.dmg
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+ 
