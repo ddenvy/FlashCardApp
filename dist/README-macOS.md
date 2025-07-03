@@ -1,56 +1,56 @@
-# QuickMind для macOS - Apple Silicon (M1, M2, M3, M4)
+# QuickMind for macOS - Apple Silicon (M1, M2, M3, M4)
 
-## Версия 2.0.0 - ARM64
+## Version 2.0.0 - ARM64
 
-### Системные требования
-- **macOS 11.0 Big Sur или новее**
-- **Apple Silicon Mac (M1, M2, M3, M4)** - нативная поддержка ARM64
-- Минимум 100 МБ свободного места на диске
+### System Requirements
+- **macOS 11.0 Big Sur or newer**
+- **Apple Silicon Mac (M1, M2, M3, M4)** - native ARM64 support
+- Minimum 100 MB free disk space
 
-### Установка
+### Installation
 
-#### Автоматическая установка (рекомендуется)
+#### Automatic Installation (recommended)
 ```bash
 chmod +x Install-QuickMind-macOS.sh
 ./Install-QuickMind-macOS.sh
 ```
 
-#### Ручная установка
-1. Извлеките `QuickMind.app` из архива
-2. Переместите в папку `/Applications`
-3. Запустите из Launchpad или Finder
+#### Manual Installation
+1. Extract `QuickMind.app` from the archive
+2. Move to `/Applications` folder
+3. Launch from Launchpad or Finder
 
-### Первый запуск
-При первом запуске macOS может показать предупреждение о безопасности:
-1. Откройте **Системные настройки** → **Конфиденциальность и безопасность**
-2. Найдите сообщение о QuickMind и нажмите **Открыть все равно**
-3. Подтвердите открытие приложения
+### First Launch
+On first launch, macOS may show a security warning:
+1. Open **System Preferences** → **Privacy & Security**
+2. Find the QuickMind message and click **Open Anyway**
+3. Confirm opening the application
 
-### Особенности ARM64 версии
-- ✅ **Нативная производительность** на Apple Silicon
-- ✅ **Оптимизированное энергопотребление**
-- ✅ **Полная поддержка M1, M2, M3, M4 процессоров**
-- ✅ **Быстрый запуск** и работа приложения
+### ARM64 Version Features
+- ✅ **Native performance** on Apple Silicon
+- ✅ **Optimized power consumption**
+- ✅ **Full support for M1, M2, M3, M4 processors**
+- ✅ **Fast launch** and application performance
 
-### Возможности приложения
-- 📚 Создание флеш-карточек для изучения
-- 🌍 Многоязычный интерфейс (Русский, English, 中文)
-- 🎯 Режим изучения с отслеживанием прогресса
-- 💾 Локальное хранение данных (SQLite)
-- 🔄 Автоматическое сохранение прогресса
+### Application Features
+- 📚 Create flashcards for studying
+- 🌍 Multi-language interface (Russian, English, 中文)
+- 🎯 Study mode with progress tracking
+- 💾 Local data storage (SQLite)
+- 🔄 Automatic progress saving
 
-### Техническая информация
-- **Архитектура:** ARM64 (Apple Silicon)
+### Technical Information
+- **Architecture:** ARM64 (Apple Silicon)
 - **Framework:** .NET 9 + Avalonia UI
-- **База данных:** SQLite
-- **Размер:** ~47 МБ (сжато)
+- **Database:** SQLite
+- **Size:** ~47 MB (compressed)
 
-### Поддержка
-Если возникают проблемы:
-1. Проверьте версию macOS (требуется 11.0+)
-2. Убедитесь что используется Apple Silicon Mac
-3. Перезапустите приложение
-4. При необходимости переустановите приложение
+### Support
+If you encounter issues:
+1. Check macOS version (requires 11.0+)
+2. Ensure you're using an Apple Silicon Mac
+3. Restart the application
+4. Reinstall the application if necessary
 
 ---
-*QuickMind v2.0.0 - Приложение для эффективного изучения с флеш-карточками*
+*QuickMind v2.0.0 - Efficient learning application with flashcards*

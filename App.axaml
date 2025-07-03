@@ -12,7 +12,7 @@ xmlns:local="using:QuickMind"
     <Application.Styles>
         <FluentTheme />
         
-        <!-- Глобальные стили для темной темы -->
+        <!-- Global styles for dark theme -->
         <Style Selector="Window">
             <Setter Property="Background" Value="#1E1E1E"/>
             <Setter Property="FontFamily" Value="Corus"/>
@@ -48,7 +48,7 @@ xmlns:local="using:QuickMind"
             <Setter Property="Background" Value="#4A4A4A"/>
         </Style>
         
-        <!-- Стиль для основных кнопок действий -->
+        <!-- Style for primary action buttons -->
         <Style Selector="Button.primary">
             <Setter Property="Background" Value="#404040"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
@@ -60,7 +60,7 @@ xmlns:local="using:QuickMind"
             <Setter Property="Background" Value="#505050"/>
         </Style>
         
-        <!-- Стиль для опасных действий -->
+        <!-- Style for dangerous actions -->
         <Style Selector="Button.danger">
             <Setter Property="Background" Value="#3A2A2A"/>
             <Setter Property="Foreground" Value="#FF6B6B"/>
@@ -72,7 +72,7 @@ xmlns:local="using:QuickMind"
             <Setter Property="Background" Value="#4A3A3A"/>
         </Style>
         
-        <!-- Стиль для кнопок успеха -->
+        <!-- Style for success buttons -->
         <Style Selector="Button.success">
             <Setter Property="Background" Value="#2A3A2A"/>
             <Setter Property="Foreground" Value="#6BFF6B"/>

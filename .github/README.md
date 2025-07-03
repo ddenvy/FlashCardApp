@@ -1,146 +1,146 @@
-# GitHub Actions для QuickMind
+# GitHub Actions for QuickMind
 
-Этот репозиторий содержит автоматические workflows для сборки и релиза приложения QuickMind на разных платформах.
+This repository contains automated workflows for building and releasing the QuickMind application on different platforms.
 
 ## Workflows
 
-### 1. `build-macos.yml` - Сборка macOS
-**Назначение**: Создает DMG файлы для macOS (Intel и Apple Silicon)
+### 1. `build-macos.yml` - macOS Build
+**Purpose**: Creates DMG files for macOS (Intel and Apple Silicon)
 
-**Запуск**:
-- Автоматически при создании тега версии (`v*`)
-- Вручную через GitHub Actions UI
-- При pull request в main ветку
+**Triggered by**:
+- Automatically when creating a version tag (`v*`)
+- Manually through GitHub Actions UI
+- On pull request to main branch
 
-**Что делает**:
-- Собирает приложение для osx-x64 и osx-arm64
-- Создает .app bundle с правильной структурой
-- Конвертирует PNG иконку в .icns формат
-- Упаковывает в DMG файл
-- Создает GitHub Release с артефактами
+**What it does**:
+- Builds application for osx-x64 and osx-arm64
+- Creates .app bundle with proper structure
+- Converts PNG icon to .icns format
+- Packages into DMG file
+- Creates GitHub Release with artifacts
 
-### 2. `release.yml` - Полный релиз
-**Назначение**: Создает полный релиз для всех платформ (Windows + macOS)
+### 2. `release.yml` - Full Release
+**Purpose**: Creates complete release for all platforms (Windows + macOS)
 
-**Запуск**:
-- Автоматически при создании тега версии (`v*`)
-- Вручную через GitHub Actions UI
+**Triggered by**:
+- Automatically when creating a version tag (`v*`)
+- Manually through GitHub Actions UI
 
-**Что делает**:
-- Собирает Windows установщик (.exe)
-- Собирает macOS DMG файлы (Intel + Apple Silicon)
-- Создает единый GitHub Release со всеми артефактами
+**What it does**:
+- Builds Windows installer (.exe)
+- Builds macOS DMG files (Intel + Apple Silicon)
+- Creates unified GitHub Release with all artifacts
 
-## Как использовать
+## How to Use
 
-### Автоматический релиз
-1. Создайте новый тег версии:
+### Automatic Release
+1. Create a new version tag:
    ```bash
    git tag v2.1.0
    git push origin v2.1.0
    ```
 
-2. GitHub Actions автоматически:
-   - Соберет все версии приложения
-   - Создаст GitHub Release
-   - Загрузит все артефакты
+2. GitHub Actions will automatically:
+   - Build all application versions
+   - Create GitHub Release
+   - Upload all artifacts
 
-### Ручной запуск
-1. Перейдите в раздел "Actions" в GitHub
-2. Выберите нужный workflow
-3. Нажмите "Run workflow"
-4. Введите версию (например, `2.1.0`)
-5. Нажмите "Run workflow"
+### Manual Run
+1. Go to "Actions" section in GitHub
+2. Select the desired workflow
+3. Click "Run workflow"
+4. Enter version (e.g., `2.1.0`)
+5. Click "Run workflow"
 
-## Структура артефактов
+## Artifact Structure
 
 ### Windows
-- `QuickMind-Setup-v{version}.exe` - Полный установщик с Inno Setup
+- `QuickMind-Setup-v{version}.exe` - Complete installer with Inno Setup
 
 ### macOS
-- `QuickMind-osx-x64-v{version}.dmg` - Для Intel Macs
-- `QuickMind-osx-arm64-v{version}.dmg` - Для Apple Silicon Macs (M1/M2/M3)
+- `QuickMind-osx-x64-v{version}.dmg` - For Intel Macs
+- `QuickMind-osx-arm64-v{version}.dmg` - For Apple Silicon Macs (M1/M2/M3)
 
-## Требования
+## Requirements
 
-### Для Windows сборки
-- Windows runner (автоматически)
+### For Windows Build
+- Windows runner (automatic)
 - .NET 9.0 SDK
-- Inno Setup (предустановлен на GitHub runners)
+- Inno Setup (pre-installed on GitHub runners)
 
-### Для macOS сборки
-- macOS runner (автоматически)
+### For macOS Build
+- macOS runner (automatic)
 - .NET 9.0 SDK
-- Xcode command line tools (предустановлены)
+- Xcode command line tools (pre-installed)
 
-## Особенности
+## Features
 
-### Конвертация иконок
-Workflow автоматически конвертирует `Assets/QuickMindLogo.png` в `.icns` формат для macOS приложения, создавая все необходимые размеры:
+### Icon Conversion
+The workflow automatically converts `Assets/QuickMindLogo.png` to `.icns` format for macOS application, creating all necessary sizes:
 - 16x16, 32x32, 128x128, 256x256, 512x512, 1024x1024
-- Обычные и @2x (Retina) версии
+- Regular and @2x (Retina) versions
 
-### Подпись и нотаризация
-Для продакшн релизов рекомендуется добавить:
-- Подпись кода для macOS (требует Apple Developer аккаунт)
-- Нотаризацию для обхода Gatekeeper
+### Code Signing and Notarization
+For production releases, it's recommended to add:
+- Code signing for macOS (requires Apple Developer account)
+- Notarization to bypass Gatekeeper
 
-### Структура .app bundle
-Создается правильная структура macOS приложения:
+### .app Bundle Structure
+Creates proper macOS application structure:
 ```
 QuickMind.app/
 ├── Contents/
 │   ├── Info.plist
 │   ├── MacOS/
-│   │   └── QuickMind (исполняемый файл)
+│   │   └── QuickMind (executable)
 │   └── Resources/
-│       └── QuickMind.icns (иконка)
+│       └── QuickMind.icns (icon)
 ```
 
-## Отладка
+## Debugging
 
-### Логи
-- Все логи сборки доступны в разделе "Actions"
-- Каждый шаг подробно документирован
+### Logs
+- All build logs are available in the "Actions" section
+- Each step is thoroughly documented
 
-### Проблемы с DMG
-Если DMG не создается:
-1. Проверьте, что `hdiutil` доступен
-2. Убедитесь, что .app bundle создан корректно
-3. Проверьте размер временного образа
+### DMG Issues
+If DMG is not created:
+1. Check that `hdiutil` is available
+2. Ensure .app bundle is created correctly
+3. Check temporary image size
 
-### Проблемы с иконкой
-Если иконка не отображается:
-1. Убедитесь, что файл `Assets/QuickMindLogo.png` существует
-2. Проверьте, что `sips` и `iconutil` доступны
-3. Убедитесь, что .icns файл скопирован в Resources
+### Icon Issues
+If icon is not displayed:
+1. Ensure `Assets/QuickMindLogo.png` file exists
+2. Check that `sips` and `iconutil` are available
+3. Ensure .icns file is copied to Resources
 
-## Локальное тестирование
+## Local Testing
 
-### Тестирование macOS сборки
+### Testing macOS Build
 ```bash
-# Сборка для конкретной архитектуры
+# Build for specific architecture
 dotnet publish -c Release -r osx-arm64 --self-contained true -o "./publish/osx-arm64"
 
-# Создание .app bundle
+# Create .app bundle
 ./installer/Build-macOS-Installer.sh
 ```
 
-### Тестирование Windows сборки
+### Testing Windows Build
 ```powershell
-# Сборка установщика
+# Build installer
 ./installer/Build-Windows-Installer.ps1 -Version "2.1.0"
 ```
 
-## Результат
+## Result
 
-После успешной сборки:
-1. Релиз появится в разделе "Releases"
-2. Все файлы будут автоматически загружены
-3. Пользователи смогут скачать установщики для своих платформ
+After successful build:
+1. Release will appear in "Releases" section
+2. All files will be automatically uploaded
+3. Users can download installers for their platforms
 
-## Безопасность
+## Security
 
-- Все workflows используют официальные GitHub Actions
-- Токены доступа автоматически управляются GitHub
-- Артефакты хранятся в безопасном облаке GitHub 
+- All workflows use official GitHub Actions
+- Access tokens are automatically managed by GitHub
+- Artifacts are stored in secure GitHub cloud 

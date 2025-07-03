@@ -94,7 +94,7 @@ namespace QuickMind.Services
             }
             catch
             {
-                return true; // Если ошибка при чтении - считаем что нужно показать диалог
+                return true; // If error reading - assume we need to show dialog
             }
         }
 

@@ -1,40 +1,40 @@
 # QuickMind Installer Builder
 
-Этот каталог содержит скрипты для создания инсталляторов QuickMind для Windows и macOS.
+This directory contains scripts for creating QuickMind installers for Windows and macOS.
 
-## 📋 Предварительные требования
+## 📋 Prerequisites
 
-### Общие требования
-- **.NET 9.0 SDK** или новее
-- **Git** (для клонирования репозитория)
+### General Requirements
+- **.NET 9.0 SDK** or newer
+- **Git** (for cloning the repository)
 
-### Для Windows
-- **Inno Setup 6.0+** - скачать с [официального сайта](https://jrsoftware.org/isdownload.php)
-- **PowerShell 5.1+** (обычно уже установлен)
+### For Windows
+- **Inno Setup 6.0+** - download from [official website](https://jrsoftware.org/isdownload.php)
+- **PowerShell 5.1+** (usually already installed)
 
-### Для macOS
+### For macOS
 - **Xcode Command Line Tools**: `xcode-select --install`
-- **Bash** (обычно уже установлен)
-- Опционально: **create-dmg** для более красивых DMG файлов
+- **Bash** (usually already installed)
+- Optional: **create-dmg** for nicer DMG files
 
-## 🚀 Быстрый старт
+## 🚀 Quick Start
 
-### Автоматическая сборка всех инсталляторов
+### Automatic Build for All Installers
 ```powershell
-# Собрать все инсталляторы
+# Build all installers
 .\installer\Build-All.ps1
 
-# Собрать только для Windows
+# Build for Windows only
 .\installer\Build-All.ps1 -Platform Windows
 
-# Собрать только для macOS
+# Build for macOS only
 .\installer\Build-All.ps1 -Platform macOS
 
-# Собрать с определенной версией
+# Build with specific version
 .\installer\Build-All.ps1 -Version "2.1.0"
 ```
 
-### Ручная сборка
+### Manual Build
 
 #### Windows
 ```powershell
@@ -46,92 +46,92 @@
 ./installer/Build-macOS-Installer.sh
 ```
 
-## 📁 Структура файлов
+## 📁 File Structure
 
 ```
 installer/
-├── Build-All.ps1              # Универсальный скрипт сборки
-├── Build-Windows-Installer.ps1 # Скрипт для Windows
-├── Build-macOS-Installer.sh   # Скрипт для macOS
-├── QuickMind-Setup.iss        # Inno Setup конфигурация (генерируется)
-└── README.md                  # Этот файл
+├── Build-All.ps1              # Universal build script
+├── Build-Windows-Installer.ps1 # Windows script
+├── Build-macOS-Installer.sh   # macOS script
+├── QuickMind-Setup.iss        # Inno Setup configuration (generated)
+└── README.md                  # This file
 
-dist/                          # Готовые инсталляторы
-├── QuickMind-Setup-v2.0.0.exe # Windows инсталлятор
+dist/                          # Ready installers
+├── QuickMind-Setup-v2.0.0.exe # Windows installer
 ├── QuickMind-v2.0.0.dmg       # macOS DMG
 └── QuickMind.app/             # macOS App Bundle
 
-publish/                       # Скомпилированные файлы
-├── win-x64/                   # Windows сборка
-└── osx-x64/                   # macOS сборка
+publish/                       # Compiled files
+├── win-x64/                   # Windows build
+└── osx-x64/                   # macOS build
 ```
 
-## 🔧 Настройка
+## 🔧 Configuration
 
-### Изменение версии
-Отредактируйте файл `QuickMind.csproj`:
+### Changing Version
+Edit the `QuickMind.csproj` file:
 ```xml
 <Version>2.0.0</Version>
 <FileVersion>2.0.0</FileVersion>
 ```
 
-### Настройка иконки
-- **Windows**: Поместите `.ico` файл в `Assets/` и обновите путь в Inno Setup скрипте
-- **macOS**: Создайте `.icns` файл и поместите в `Contents/Resources/` app bundle
+### Icon Setup
+- **Windows**: Place `.ico` file in `Assets/` and update the path in Inno Setup script
+- **macOS**: Create `.icns` file and place in `Contents/Resources/` app bundle
 
-## 📦 Создаваемые файлы
+## 📦 Generated Files
 
 ### Windows
-- **QuickMind-Setup-v{version}.exe** - Инсталлятор для Windows
-  - Устанавливает приложение в `Program Files`
-  - Создает ярлыки в меню "Пуск" и на рабочем столе
-  - Поддерживает автоматическое удаление
+- **QuickMind-Setup-v{version}.exe** - Windows installer
+  - Installs application to `Program Files`
+  - Creates shortcuts in Start menu and desktop
+  - Supports automatic uninstall
 
 ### macOS
-- **QuickMind.app** - Приложение для macOS
-- **QuickMind-v{version}.dmg** - DMG образ для установки
-  - Содержит app bundle и ссылку на папку Applications
-  - Готов для распространения
+- **QuickMind.app** - macOS application
+- **QuickMind-v{version}.dmg** - DMG image for installation
+  - Contains app bundle and link to Applications folder
+  - Ready for distribution
 
-## 🔐 Подписание и нотаризация
+## 🔐 Code Signing and Notarization
 
-### Windows (опционально)
+### Windows (optional)
 ```powershell
-# Подписание (требует сертификат)
+# Signing (requires certificate)
 signtool sign /f certificate.pfx /p password QuickMind-Setup-v2.0.0.exe
 ```
 
-### macOS (рекомендуется для распространения)
+### macOS (recommended for distribution)
 ```bash
-# Подписание app bundle
+# Sign app bundle
 codesign --force --deep --sign "Developer ID Application: Your Name" QuickMind.app
 
-# Нотаризация (требует Apple Developer аккаунт)
+# Notarization (requires Apple Developer account)
 xcrun notarytool submit QuickMind-v2.0.0.dmg --keychain-profile "notarytool-profile" --wait
 
-# Скрепление нотаризацией
+# Staple notarization
 xcrun stapler staple QuickMind-v2.0.0.dmg
 ```
 
-## 🐛 Устранение неполадок
+## 🐛 Troubleshooting
 
 ### Windows
-- **Ошибка "Inno Setup not found"**: Установите Inno Setup и добавьте его в PATH
-- **Ошибка сборки**: Проверьте, что .NET SDK установлен правильно
-- **Проблемы с подписанием**: Убедитесь, что сертификат действителен
+- **Error "Inno Setup not found"**: Install Inno Setup and add it to PATH
+- **Build error**: Check that .NET SDK is properly installed
+- **Code signing issues**: Ensure certificate is valid
 
 ### macOS
-- **Ошибка "hdiutil not found"**: Команда должна быть доступна на всех macOS системах
-- **Проблемы с иконкой**: Используйте `iconutil` для создания .icns файла
-- **Gatekeeper блокирует**: Подпишите и нотаризуйте приложение
+- **Error "hdiutil not found"**: Command should be available on all macOS systems
+- **Icon issues**: Use `iconutil` to create .icns file
+- **Gatekeeper blocks**: Sign and notarize the application
 
-## 📝 Примечания
+## 📝 Notes
 
-- Инсталляторы создают самодостаточные сборки (не требуют установки .NET)
-- Размер инсталлятора: ~60-100 MB (включает .NET Runtime)
-- Поддерживаемые версии: Windows 10+ (x64), macOS 10.15+ (x64)
+- Installers create self-contained builds (don't require .NET installation)
+- Installer size: ~60-100 MB (includes .NET Runtime)
+- Supported versions: Windows 10+ (x64), macOS 10.15+ (x64)
 
-## 🔗 Полезные ссылки
+## 🔗 Useful Links
 
 - [Inno Setup Documentation](https://jrsoftware.org/isinfo.php)
 - [.NET Publishing Guide](https://docs.microsoft.com/en-us/dotnet/core/deploying/)

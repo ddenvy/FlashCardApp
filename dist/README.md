@@ -1,60 +1,60 @@
-# 📥 Скачивание QuickMind
+# 📥 QuickMind Downloads
 
-Здесь находятся готовые установщики для скачивания.
+Ready installers for download are located here.
 
-## 🚀 Быстрое скачивание
-
-### Windows
-- **QuickMind-Setup-v2.1.1.exe** - Полный установщик для Windows 10/11
-
-### macOS
-- **QuickMind-macOS-ARM64-v2.1.0.zip** - Для Apple Silicon Macs (M1/M2/M3)
-
-## 📋 Инструкции по установке
+## 🚀 Quick Download
 
 ### Windows
-1. Скачайте файл `QuickMind-Setup-v2.1.1.exe`
-2. Запустите установщик от имени администратора
-3. Следуйте инструкциям мастера установки
-4. Запустите приложение из меню "Пуск"
+- **QuickMind-Setup-v2.1.1.exe** - Complete installer for Windows 10/11
 
 ### macOS
-1. Скачайте файл `QuickMind-macOS-ARM64-v2.1.0.zip`
-2. Распакуйте архив
-3. Перетащите QuickMind.app в папку Applications
-4. Запустите приложение
-5. При первом запуске может потребоваться разрешить в настройках безопасности
+- **QuickMind-macOS-ARM64-v2.1.0.zip** - For Apple Silicon Macs (M1/M2/M3)
 
-## 🔄 Автоматические обновления
-
-Новые версии автоматически публикуются в [GitHub Releases](https://github.com/your-username/QuickMind/releases) через GitHub Actions при создании новых тегов версий.
-
-## 🔧 Системные требования
+## 📋 Installation Instructions
 
 ### Windows
-- Windows 10 версии 1809 или выше
-- Windows 11 (рекомендуется)
-- 50 MB свободного места на диске
+1. Download the `QuickMind-Setup-v2.1.1.exe` file
+2. Run the installer as administrator
+3. Follow the installation wizard instructions
+4. Launch the application from the Start menu
 
 ### macOS
-- macOS 11.0 (Big Sur) или выше
-- Apple Silicon (M1/M2/M3) процессор
-- 50 MB свободного места на диске
+1. Download the `QuickMind-macOS-ARM64-v2.1.0.zip` file
+2. Extract the archive
+3. Drag QuickMind.app to the Applications folder
+4. Launch the application
+5. You may need to allow the app in Security settings on first launch
 
-## 📝 Заметки к релизу
+## 🔄 Automatic Updates
 
-Подробные изменения в версии 2.1.1 смотрите в [RELEASE-NOTES-v2.1.1.md](RELEASE-NOTES-v2.1.1.md)
+New versions are automatically published to [GitHub Releases](https://github.com/your-username/QuickMind/releases) via GitHub Actions when new version tags are created.
 
-Предыдущие версии:
-- [Версия 2.1.0](RELEASE-NOTES-v2.1.0.md) - Основная версия с темной темой
+## 🔧 System Requirements
 
-## 🆘 Поддержка
+### Windows
+- Windows 10 version 1809 or later
+- Windows 11 (recommended)
+- 50 MB free disk space
 
-Если у вас возникли проблемы:
-1. Проверьте [Issues](https://github.com/your-username/QuickMind/issues)
-2. Создайте новый issue с описанием проблемы
-3. Укажите вашу операционную систему и версию
+### macOS
+- macOS 11.0 (Big Sur) or later
+- Apple Silicon (M1/M2/M3) processor
+- 50 MB free disk space
+
+## 📝 Release Notes
+
+For detailed changes in version 2.1.1, see [RELEASE-NOTES-v2.1.1.md](RELEASE-NOTES-v2.1.1.md)
+
+Previous versions:
+- [Version 2.1.0](RELEASE-NOTES-v2.1.0.md) - Major version with dark theme
+
+## 🆘 Support
+
+If you encounter issues:
+1. Check [Issues](https://github.com/your-username/QuickMind/issues)
+2. Create a new issue with problem description
+3. Include your operating system and version
 
 ---
 
-💡 **Совет**: Для получения последних версий используйте [GitHub Releases](https://github.com/your-username/QuickMind/releases) 
+💡 **Tip**: For latest versions, use [GitHub Releases](https://github.com/your-username/QuickMind/releases) 

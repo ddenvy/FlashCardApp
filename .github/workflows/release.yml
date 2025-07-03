@@ -265,62 +265,60 @@ jobs:
         body: |
           ## QuickMind v${{ steps.get_version.outputs.VERSION }}
           
-          ### 🚀 Новые возможности
-          - Обновленный темный дизайн интерфейса
-          - Единообразные размеры всех элементов
-          - Улучшенная консистентность UI
-          - Исправлены ошибки привязки данных
+          ### 🚀 New Features
+          - Updated dark interface design
+          - Consistent element sizing throughout
+          - Improved UI consistency
+          - Fixed data binding issues
           
-          ### 💾 Скачать
+          ### 💾 Download
           
           #### Windows
-          - **QuickMind-Setup-v${{ steps.get_version.outputs.VERSION }}.exe** - Полный установщик для Windows 10/11
+          - **QuickMind-Setup-v${{ steps.get_version.outputs.VERSION }}.exe** - Complete installer for Windows 10/11
           
           #### macOS
-          - **QuickMind-osx-x64-v${{ steps.get_version.outputs.VERSION }}.dmg** - Для Intel Macs
-          - **QuickMind-osx-arm64-v${{ steps.get_version.outputs.VERSION }}.dmg** - Для Apple Silicon Macs (M1/M2/M3)
+          - **QuickMind-osx-x64-v${{ steps.get_version.outputs.VERSION }}.dmg** - For Intel Macs
+          - **QuickMind-osx-arm64-v${{ steps.get_version.outputs.VERSION }}.dmg** - For Apple Silicon Macs (M1/M2/M3)
           
           #### Linux
           - **quickmind_${{ steps.get_version.outputs.VERSION }}_amd64.deb** - Debian/Ubuntu (x64)
           - **quickmind_${{ steps.get_version.outputs.VERSION }}_arm64.deb** - Debian/Ubuntu (ARM64)
           - **quickmind-${{ steps.get_version.outputs.VERSION }}-1.*.x86_64.rpm** - Red Hat/Fedora/openSUSE (x64)
           - **quickmind-${{ steps.get_version.outputs.VERSION }}-1.*.aarch64.rpm** - Red Hat/Fedora/openSUSE (ARM64)
-          - **QuickMind-${{ steps.get_version.outputs.VERSION }}-x86_64.AppImage** - Универсальный AppImage (x64)
+          - **QuickMind-${{ steps.get_version.outputs.VERSION }}-x86_64.AppImage** - Universal AppImage (x64)
+          - **QuickMind-${{ steps.get_version.outputs.VERSION }}.flatpak** - Flatpak package
           
-          - **QuickMind-${{ steps.get_version.outputs.VERSION }}.flatpak** - Flatpak пакет
-  
-          
-          ### 📋 Инструкции по установке
+          ### 📋 Installation Instructions
           
           #### Windows
-          1. Скачайте файл `QuickMind-Setup-v${{ steps.get_version.outputs.VERSION }}.exe`
-          2. Запустите установщик от имени администратора
-          3. Следуйте инструкциям мастера установки
-          4. Запустите приложение из меню "Пуск"
+          1. Download the `QuickMind-Setup-v${{ steps.get_version.outputs.VERSION }}.exe` file
+          2. Run the installer as administrator
+          3. Follow the installation wizard instructions
+          4. Launch the application from the Start menu
           
           #### macOS
-          1. Скачайте подходящий для вашего Mac DMG файл
-          2. Откройте DMG файл
-          3. Перетащите QuickMind.app в папку Applications
-          4. Запустите QuickMind из папки Applications
-          5. При первом запуске может потребоваться разрешить в настройках безопасности
+          1. Download the appropriate DMG file for your Mac
+          2. Open the DMG file
+          3. Drag QuickMind.app to the Applications folder
+          4. Launch QuickMind from the Applications folder
+          5. You may need to allow the app in Security settings on first launch
           
           #### Linux
           
           **Debian/Ubuntu (.deb):**
           ```bash
           sudo dpkg -i quickmind_${{ steps.get_version.outputs.VERSION }}_amd64.deb
-          sudo apt-get install -f  # Если есть проблемы с зависимостями
+          sudo apt-get install -f  # If there are dependency issues
           ```
           
           **Red Hat/Fedora/openSUSE (.rpm):**
           ```bash
           sudo rpm -i quickmind-${{ steps.get_version.outputs.VERSION }}-1.*.x86_64.rpm
-          # или
+          # or
           sudo dnf install quickmind-${{ steps.get_version.outputs.VERSION }}-1.*.x86_64.rpm
           ```
           
-          **AppImage (универсальный):**
+          **AppImage (universal):**
           ```bash
           chmod +x QuickMind-${{ steps.get_version.outputs.VERSION }}-x86_64.AppImage
           ./QuickMind-${{ steps.get_version.outputs.VERSION }}-x86_64.AppImage
@@ -332,42 +330,40 @@ jobs:
           flatpak run com.quickmind.QuickMind
           ```
           
-
-          
           **Arch Linux:**
-          Используйте PKGBUILD из архива quickmind-${{ steps.get_version.outputs.VERSION }}-src.tar.gz
+          Use PKGBUILD from quickmind-${{ steps.get_version.outputs.VERSION }}-src.tar.gz archive
           
           **Gentoo:**
-          Используйте ebuild из архива quickmind-${{ steps.get_version.outputs.VERSION }}-src.tar.gz
+          Use ebuild from quickmind-${{ steps.get_version.outputs.VERSION }}-src.tar.gz archive
           
-          ### 🔧 Системные требования
+          ### 🔧 System Requirements
           
           #### Windows
-          - Windows 10 версии 1809 или выше
-          - Windows 11 (рекомендуется)
-          - 50 MB свободного места на диске
+          - Windows 10 version 1809 or later
+          - Windows 11 (recommended)
+          - 50 MB free disk space
           
           #### macOS
-          - macOS 11.0 (Big Sur) или выше
-          - 50 MB свободного места на диске
+          - macOS 11.0 (Big Sur) or later
+          - 50 MB free disk space
           
           #### Linux
-          - Linux kernel 3.17+ (для glibc 2.17+)
-          - X11 или Wayland дисплей-сервер
-          - 50 MB свободного места на диске
-          - Поддерживаемые дистрибутивы:
+          - Linux kernel 3.17+ (for glibc 2.17+)
+          - X11 or Wayland display server
+          - 50 MB free disk space
+          - Supported distributions:
             - Ubuntu 18.04+, Debian 9+
             - Fedora 29+, CentOS 8+, RHEL 8+
             - openSUSE Leap 15.0+
-            - Arch Linux (текущий)
-            - Gentoo (текущий)
+            - Arch Linux (current)
+            - Gentoo (current)
           
-          ### 🏗️ Сборка
-          Собрано с помощью .NET 9.0 и Avalonia UI
+          ### 🏗️ Build
+          Built with .NET 9.0 and Avalonia UI
           
           ---
           
-          **Полный changelog**: https://github.com/ddenvy/QuickMind/compare/v2.0.0...v${{ steps.get_version.outputs.VERSION }}
+          **Full changelog**: https://github.com/ddenvy/QuickMind/compare/v2.0.0...v${{ steps.get_version.outputs.VERSION }}
         files: |
           QuickMind-Windows-v${{ steps.get_version.outputs.VERSION }}/QuickMind-Setup-v${{ steps.get_version.outputs.VERSION }}.exe
           QuickMind-osx-x64-v${{ steps.get_version.outputs.VERSION }}/QuickMind-osx-x64-v${{ steps.get_version.outputs.VERSION }}.dmg

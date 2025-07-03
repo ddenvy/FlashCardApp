@@ -1,211 +1,211 @@
-# QuickMind - Инструкции по установке для Linux
+# QuickMind - Linux Installation Guide
 
-QuickMind доступен для Linux в различных форматах пакетов. Выберите наиболее подходящий для вашего дистрибутива.
+QuickMind is available for Linux in various package formats. Choose the most suitable one for your distribution.
 
-## 📦 Доступные форматы пакетов
+## 📦 Available Package Formats
 
-### 1. DEB пакеты (Debian/Ubuntu)
-- **quickmind_VERSION_amd64.deb** - для x64 систем
-- **quickmind_VERSION_arm64.deb** - для ARM64 систем
+### 1. DEB packages (Debian/Ubuntu)
+- **quickmind_VERSION_amd64.deb** - for x64 systems
+- **quickmind_VERSION_arm64.deb** - for ARM64 systems
 
-### 2. RPM пакеты (Red Hat/Fedora/openSUSE)
-- **quickmind-VERSION-1.*.x86_64.rpm** - для x64 систем
-- **quickmind-VERSION-1.*.aarch64.rpm** - для ARM64 систем
+### 2. RPM packages (Red Hat/Fedora/openSUSE)
+- **quickmind-VERSION-1.*.x86_64.rpm** - for x64 systems
+- **quickmind-VERSION-1.*.aarch64.rpm** - for ARM64 systems
 
-### 3. AppImage (универсальный)
-- **QuickMind-VERSION-x86_64.AppImage** - для x64 систем
-- **QuickMind-VERSION-aarch64.AppImage** - для ARM64 систем
+### 3. AppImage (universal)
+- **QuickMind-VERSION-x86_64.AppImage** - for x64 systems
+- **QuickMind-VERSION-aarch64.AppImage** - for ARM64 systems
 
 ### 4. Flatpak
-- **QuickMind-VERSION.flatpak** - универсальный пакет
+- **QuickMind-VERSION.flatpak** - universal package
 
 ### 5. Snap
-- **quickmind_VERSION_amd64.snap** - для x64 систем
+- **quickmind_VERSION_amd64.snap** - for x64 systems
 
-### 6. Исходники
-- **quickmind-VERSION-src.tar.gz** - исходный код для сборки
+### 6. Source packages
+- **quickmind-VERSION-src.tar.gz** - source code for building
 
-## 🔧 Инструкции по установке
+## 🔧 Installation Instructions
 
 ### Debian/Ubuntu (.deb)
 
 ```bash
-# Скачайте соответствующий .deb файл
+# Download the appropriate .deb file
 wget https://github.com/ddenvy/QuickMind/releases/download/vVERSION/quickmind_VERSION_amd64.deb
 
-# Установка
+# Installation
 sudo dpkg -i quickmind_VERSION_amd64.deb
 
-# Если есть проблемы с зависимостями
+# If there are dependency issues
 sudo apt-get install -f
 
-# Запуск
+# Launch
 quickmind
 ```
 
 ### Red Hat/Fedora/CentOS (.rpm)
 
 ```bash
-# Скачайте соответствующий .rpm файл
+# Download the appropriate .rpm file
 wget https://github.com/ddenvy/QuickMind/releases/download/vVERSION/quickmind-VERSION-1.*.x86_64.rpm
 
-# Установка на Fedora/CentOS
+# Installation on Fedora/CentOS
 sudo dnf install quickmind-VERSION-1.*.x86_64.rpm
 
-# Установка на старых версиях
+# Installation on older versions
 sudo rpm -i quickmind-VERSION-1.*.x86_64.rpm
 
-# Запуск
+# Launch
 quickmind
 ```
 
 ### openSUSE (.rpm)
 
 ```bash
-# Скачайте соответствующий .rpm файл
+# Download the appropriate .rpm file
 wget https://github.com/ddenvy/QuickMind/releases/download/vVERSION/quickmind-VERSION-1.*.x86_64.rpm
 
-# Установка
+# Installation
 sudo zypper install quickmind-VERSION-1.*.x86_64.rpm
 
-# Запуск
+# Launch
 quickmind
 ```
 
-### AppImage (универсальный)
+### AppImage (universal)
 
 ```bash
-# Скачайте AppImage файл
+# Download AppImage file
 wget https://github.com/ddenvy/QuickMind/releases/download/vVERSION/QuickMind-VERSION-x86_64.AppImage
 
-# Сделайте исполняемым
+# Make executable
 chmod +x QuickMind-VERSION-x86_64.AppImage
 
-# Запуск
+# Launch
 ./QuickMind-VERSION-x86_64.AppImage
 
-# Опционально: интеграция с системой
-# Для этого можно переместить файл в ~/.local/bin или /usr/local/bin
+# Optional: system integration
+# You can move the file to ~/.local/bin or /usr/local/bin
 ```
 
 ### Flatpak
 
 ```bash
-# Скачайте Flatpak файл
+# Download Flatpak file
 wget https://github.com/ddenvy/QuickMind/releases/download/vVERSION/QuickMind-VERSION.flatpak
 
-# Установка
+# Installation
 flatpak install --user QuickMind-VERSION.flatpak
 
-# Запуск
+# Launch
 flatpak run com.quickmind.QuickMind
 
-# Альтернативно через GUI
-# Файл появится в списке приложений
+# Alternatively through GUI
+# The app will appear in your application list
 ```
 
 ### Snap
 
 ```bash
-# Скачайте Snap файл
+# Download Snap file
 wget https://github.com/ddenvy/QuickMind/releases/download/vVERSION/quickmind_VERSION_amd64.snap
 
-# Установка
+# Installation
 sudo snap install quickmind_VERSION_amd64.snap --dangerous
 
-# Запуск
+# Launch
 quickmind
 ```
 
 ### Arch Linux
 
 ```bash
-# Скачайте исходный архив
+# Download source archive
 wget https://github.com/ddenvy/QuickMind/releases/download/vVERSION/quickmind-VERSION-src.tar.gz
 
-# Распакуйте архив
+# Extract archive
 tar -xzf quickmind-VERSION-src.tar.gz
 
-# Найдите PKGBUILD файл в arch-package/
+# Find PKGBUILD file in arch-package/
 cd quickmind-VERSION/arch-package
 
-# Сборка пакета
+# Build package
 makepkg -si
 
-# Запуск
+# Launch
 quickmind
 ```
 
 ### Gentoo
 
 ```bash
-# Скачайте исходный архив
+# Download source archive
 wget https://github.com/ddenvy/QuickMind/releases/download/vVERSION/quickmind-VERSION-src.tar.gz
 
-# Распакуйте архив
+# Extract archive
 tar -xzf quickmind-VERSION-src.tar.gz
 
-# Скопируйте ebuild в ваш локальный оверлей
+# Copy ebuild to your local overlay
 sudo cp -r quickmind-VERSION/gentoo-package/app-misc/quickmind /usr/local/portage/app-misc/
 
-# Создайте манифест
+# Create manifest
 cd /usr/local/portage/app-misc/quickmind
 sudo ebuild quickmind-VERSION.ebuild manifest
 
-# Установка
+# Installation
 sudo emerge quickmind
 
-# Запуск
+# Launch
 quickmind
 ```
 
-### Сборка из исходников
+### Building from Source
 
 ```bash
-# Требования: .NET 9.0 SDK
-# Установите .NET SDK для вашего дистрибутива
+# Requirements: .NET 9.0 SDK
+# Install .NET SDK for your distribution
 
-# Скачайте исходный код
+# Download source code
 git clone https://github.com/ddenvy/QuickMind.git
 cd QuickMind
 
-# Восстановите зависимости
+# Restore dependencies
 dotnet restore
 
-# Сборка
+# Build
 dotnet build -c Release
 
-# Запуск
+# Launch
 dotnet run -c Release
 ```
 
-## 📋 Системные требования
+## 📋 System Requirements
 
-### Минимальные требования
-- **CPU**: x64 или ARM64 процессор
+### Minimum Requirements
+- **CPU**: x64 or ARM64 processor
 - **RAM**: 512 MB
-- **Диск**: 50 MB свободного места
-- **ОС**: Linux kernel 3.17+ (glibc 2.17+)
+- **Disk**: 50 MB free space
+- **OS**: Linux kernel 3.17+ (glibc 2.17+)
 
-### Поддерживаемые дистрибутивы
+### Supported Distributions
 
 #### Debian-based
-- Ubuntu 18.04 LTS и выше
-- Debian 9 (Stretch) и выше
-- Linux Mint 19 и выше
-- Pop!_OS 18.04 и выше
+- Ubuntu 18.04 LTS and later
+- Debian 9 (Stretch) and later
+- Linux Mint 19 and later
+- Pop!_OS 18.04 and later
 
 #### Red Hat-based
-- Fedora 29 и выше
-- CentOS 8 и выше
-- RHEL 8 и выше
-- Rocky Linux 8 и выше
-- AlmaLinux 8 и выше
+- Fedora 29 and later
+- CentOS 8 and later
+- RHEL 8 and later
+- Rocky Linux 8 and later
+- AlmaLinux 8 and later
 
 #### SUSE-based
-- openSUSE Leap 15.0 и выше
+- openSUSE Leap 15.0 and later
 - openSUSE Tumbleweed
-- SLES 15 и выше
+- SLES 15 and later
 
 #### Arch-based
 - Arch Linux (rolling release)
@@ -215,8 +215,8 @@ dotnet run -c Release
 #### Gentoo
 - Gentoo Linux (current)
 
-### Зависимости
-QuickMind автоматически включает необходимые зависимости, но для некоторых дистрибутивов могут потребоваться дополнительные пакеты:
+### Dependencies
+QuickMind automatically includes necessary dependencies, but some distributions may require additional packages:
 
 ```bash
 # Debian/Ubuntu
@@ -232,59 +232,59 @@ sudo zypper install glibc libgcc_s1 libopenssl3
 sudo pacman -S glibc gcc-libs openssl
 ```
 
-## 🐛 Решение проблем
+## 🐛 Troubleshooting
 
-### Приложение не запускается
+### Application won't start
 
-1. **Проверьте зависимости**:
+1. **Check dependencies**:
    ```bash
-   ldd /usr/bin/QuickMind  # для установленных пакетов
-   ldd ./QuickMind         # для AppImage после монтирования
+   ldd /usr/bin/QuickMind  # for installed packages
+   ldd ./QuickMind         # for AppImage after mounting
    ```
 
-2. **Проверьте права доступа**:
+2. **Check permissions**:
    ```bash
    chmod +x /path/to/QuickMind
    ```
 
-3. **Запустите из терминала для просмотра ошибок**:
+3. **Run from terminal to see errors**:
    ```bash
-   /usr/bin/QuickMind  # или путь к вашему исполняемому файлу
+   /usr/bin/QuickMind  # or path to your executable
    ```
 
-### Проблемы с дисплеем
+### Display issues
 
-1. **Для X11**:
+1. **For X11**:
    ```bash
    export DISPLAY=:0
    quickmind
    ```
 
-2. **Для Wayland**:
+2. **For Wayland**:
    ```bash
    export GDK_BACKEND=wayland
    quickmind
    ```
 
-### Проблемы с разрешениями (Flatpak/Snap)
+### Permission issues (Flatpak/Snap)
 
-1. **Flatpak - доступ к домашней директории**:
+1. **Flatpak - home directory access**:
    ```bash
    flatpak override --user --filesystem=home com.quickmind.QuickMind
    ```
 
-2. **Snap - подключение интерфейсов**:
+2. **Snap - interface connections**:
    ```bash
    sudo snap connect quickmind:home :home
    ```
 
-## 🔄 Обновление
+## 🔄 Updating
 
-### DEB/RPM пакеты
-Скачайте и установите новую версию аналогично первой установке.
+### DEB/RPM packages
+Download and install the new version similar to the first installation.
 
 ### AppImage
-Просто скачайте новый AppImage файл и замените старый.
+Simply download the new AppImage file and replace the old one.
 
 ### Flatpak
 ```bash
@@ -296,21 +296,21 @@ flatpak update com.quickmind.QuickMind
 sudo snap refresh quickmind
 ```
 
-## 🗑️ Удаление
+## 🗑️ Uninstalling
 
-### DEB пакеты
+### DEB packages
 ```bash
 sudo apt-get remove quickmind
 ```
 
-### RPM пакеты
+### RPM packages
 ```bash
 sudo dnf remove quickmind  # Fedora/CentOS
 sudo zypper remove quickmind  # openSUSE
 ```
 
 ### AppImage
-Просто удалите файл AppImage.
+Simply delete the AppImage file.
 
 ### Flatpak
 ```bash
@@ -322,14 +322,14 @@ flatpak uninstall com.quickmind.QuickMind
 sudo snap remove quickmind
 ```
 
-## 📞 Поддержка
+## 📞 Support
 
-Если у вас возникли проблемы с установкой или использованием QuickMind на Linux:
+If you encounter issues with installing or using QuickMind on Linux:
 
-1. Проверьте [Issues на GitHub](https://github.com/ddenvy/QuickMind/issues)
-2. Создайте новый issue с описанием проблемы
-3. Укажите вашу версию дистрибутива и архитектуру процессора
+1. Check [GitHub Issues](https://github.com/ddenvy/QuickMind/issues)
+2. Create a new issue with problem description
+3. Include your distribution version and processor architecture
 
 ---
 
-**Совет**: Для большинства пользователей рекомендуется использовать DEB/RPM пакеты для лучшей интеграции с системой, или AppImage для максимальной совместимости. 
+**Tip**: For most users, we recommend using DEB/RPM packages for better system integration, or AppImage for maximum compatibility. 

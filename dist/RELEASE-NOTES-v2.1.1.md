@@ -1,48 +1,48 @@
-# QuickMind v2.1.1 Исправления и улучшения
+# QuickMind v2.1.1 Fixes and Improvements
 
-## Что исправлено
+## What's Fixed
 
-### 🔧 Исправление иконки в панели задач
-- **Встроенная иконка**: Теперь иконка QuickMind правильно отображается в панели задач Windows
-- **Настройка проекта**: Добавлен параметр `ApplicationIcon` в файл проекта
-- **Единообразие**: Иконка теперь везде одинаковая - в окне приложения, панели задач и ярлыках
+### 🔧 Taskbar Icon Fix
+- **Embedded Icon**: QuickMind icon now properly displays in Windows taskbar
+- **Project Configuration**: Added `ApplicationIcon` parameter to project file
+- **Consistency**: Icon is now uniform everywhere - in application window, taskbar, and shortcuts
 
-### 🌐 Исправление локализации
-- **Кнопки карточек**: Исправлено отображение кнопок "Редактировать" и "Удалить" - теперь они корректно переводятся на выбранный язык
-- **Язык по умолчанию**: При первом запуске приложение всегда запускается на английском языке, независимо от системных настроек
-- **Сохранение выбора**: Выбранный язык сохраняется и применяется при следующих запусках
+### 🌐 Localization Fix
+- **Card Buttons**: Fixed display of "Edit" and "Delete" buttons - they now correctly translate to the selected language
+- **Default Language**: On first launch, the application always starts in English, regardless of system settings
+- **Choice Saving**: Selected language is saved and applied on subsequent launches
 
-### 🎨 Улучшения ярлыков
-- **Упрощение**: Убраны лишние настройки иконок из установщика для лучшей совместимости
-- **Чистота кода**: Удалены все комментарии из исходного кода - теперь код самодокументирующийся
+### 🎨 Shortcut Improvements
+- **Simplification**: Removed unnecessary icon settings from installer for better compatibility
+- **Clean Code**: Removed all comments from source code - now the code is self-documenting
 
-## Технические детали
+## Technical Details
 
-- **Версия**: 2.1.1
-- **Размер установщика**: 34.15 MB
-- **Совместимость**: Windows 10/11 (64-bit)
-- **Зависимости**: .NET 9.0 (включен в установщик)
+- **Version**: 2.1.1
+- **Installer Size**: 34.15 MB
+- **Compatibility**: Windows 10/11 (64-bit)
+- **Dependencies**: .NET 9.0 (included in installer)
 
-## Скачать
+## Download
 
 - **Windows**: [QuickMind-Setup-v2.1.1.exe](./QuickMind-Setup-v2.1.1.exe) (34.15 MB)
 - **macOS**: [QuickMind-macOS-ARM64-v2.1.0.zip](./QuickMind-macOS-ARM64-v2.1.0.zip) (45 MB)
 
-## Особенности
+## Features
 
-### Изучение флеш-карт
-- Добавляйте карты с вопросами и ответами
-- Изучайте в интерактивном режиме
-- Система прогресса: Новые → Изучаемые → Изученные
+### Flashcard Learning
+- Add cards with questions and answers
+- Study in interactive mode
+- Progress system: New → Learning → Known
 
-### Многоязычность
-- Поддержка языков: English, Русский, 中文
-- Мгновенное переключение языков
-- Локализация всех элементов интерфейса
+### Multi-language Support
+- Supported languages: English, Russian, 中文
+- Instant language switching
+- Localization of all interface elements
 
-### Современный дизайн
-- Темная тема для комфортного обучения
-- Шрифт Corus для лучшей читаемости
-- Минималистичный и понятный интерфейс
+### Modern Design
+- Dark theme for comfortable learning
+- Corus font for better readability
+- Minimalist and intuitive interface
 
-**Предыдущая версия**: [v2.1.0](./RELEASE-NOTES-v2.1.0.md) 
+**Previous version**: [v2.1.0](./RELEASE-NOTES-v2.1.0.md) 

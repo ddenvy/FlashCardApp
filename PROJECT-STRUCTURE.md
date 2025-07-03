@@ -1,161 +1,161 @@
-# 📁 Структура проекта QuickMind
+# 📁 QuickMind Project Structure
 
-## 🏗️ Архитектура
-QuickMind построен на **.NET 9.0** с использованием **Avalonia UI** по паттерну **MVVM**.
+## 🏗️ Architecture
+QuickMind is built on **.NET 9.0** using **Avalonia UI** following the **MVVM** pattern.
 
-## 📂 Структура папок
+## 📂 Folder Structure
 
-### 🔧 Основные файлы
+### 🔧 Core Files
 ```
 QuickMind/
-├── App.axaml                  # Стили и ресурсы приложения
-├── App.axaml.cs              # Логика инициализации приложения
-├── Program.cs                # Точка входа в приложение
-├── QuickMind.csproj          # Конфигурация проекта
-├── ViewLocator.cs            # Связывание View и ViewModel
-├── app.manifest              # Манифест для Windows
-└── .gitignore                # Игнорируемые файлы Git
+├── App.axaml                  # Application styles and resources
+├── App.axaml.cs              # Application initialization logic
+├── Program.cs                # Application entry point
+├── QuickMind.csproj          # Project configuration
+├── ViewLocator.cs            # View and ViewModel binding
+├── app.manifest              # Windows manifest
+└── .gitignore                # Git ignored files
 ```
 
-### 🎯 Модели (Models/)
+### 🎯 Models (Models/)
 ```
 Models/
-├── FlashCard.cs              # Модель карточки
-└── FlashCardContext.cs       # Контекст базы данных EF Core
+├── FlashCard.cs              # FlashCard model
+└── FlashCardContext.cs       # EF Core database context
 ```
 
 ### 🧠 ViewModels (ViewModels/)
 ```
 ViewModels/
-├── MainWindowViewModel.cs           # Главное окно
-├── StudyModeViewModel.cs           # Режим изучения
-├── AddCardDialogViewModel.cs       # Диалог добавления карточки
-├── LanguageSelectionViewModel.cs   # Выбор языка
-├── ViewModelBase.cs               # Базовый класс ViewModel
-└── RelayCommand.cs                # Команды для MVVM
+├── MainWindowViewModel.cs           # Main window
+├── StudyModeViewModel.cs           # Study mode
+├── AddCardDialogViewModel.cs       # Add card dialog
+├── LanguageSelectionViewModel.cs   # Language selection
+├── ViewModelBase.cs               # Base ViewModel class
+└── RelayCommand.cs                # MVVM commands
 ```
 
-### 🖥️ Представления (Views/)
+### 🖥️ Views (Views/)
 ```
 Views/
-├── MainWindow.axaml(.cs)           # Главное окно
-├── StudyModeWindow.axaml(.cs)      # Окно режима изучения
-├── AddCardDialog.axaml(.cs)        # Диалог добавления карточки
-└── LanguageSelectionWindow.axaml(.cs) # Окно выбора языка
+├── MainWindow.axaml(.cs)           # Main window
+├── StudyModeWindow.axaml(.cs)      # Study mode window
+├── AddCardDialog.axaml(.cs)        # Add card dialog
+└── LanguageSelectionWindow.axaml(.cs) # Language selection window
 ```
 
-### ⚙️ Сервисы (Services/)
+### ⚙️ Services (Services/)
 ```
 Services/
-├── CardService.cs            # Работа с карточками
-└── LocalizationService.cs   # Многоязычность
+├── CardService.cs            # Card operations
+└── LocalizationService.cs   # Multi-language support
 ```
 
-### 🔄 Конвертеры (Converters/)
+### 🔄 Converters (Converters/)
 ```
 Converters/
-└── LocalizationConverter.cs # Конвертер для локализации
+└── LocalizationConverter.cs # Localization converter
 ```
 
-### 🎨 Ресурсы (Assets/)
+### 🎨 Resources (Assets/)
 ```
 Assets/
-├── QuickMindLogo.png        # Логотип приложения
-└── avalonia-logo.ico        # Иконка Avalonia
+├── QuickMindLogo.png        # Application logo
+└── avalonia-logo.ico        # Avalonia icon
 ```
 
-### 🏗️ Сборка (installer/)
+### 🏗️ Build (installer/)
 ```
 installer/
-├── Build-All.ps1                    # Сборка для всех платформ
-├── Build-Windows-Installer.ps1     # Сборка Windows установщика
-├── Build-macOS-Installer.sh        # Сборка macOS DMG
-├── QuickMind-Setup.iss             # Конфигурация Inno Setup
-└── README.md                       # Документация по сборке
+├── Build-All.ps1                    # Build for all platforms
+├── Build-Windows-Installer.ps1     # Build Windows installer
+├── Build-macOS-Installer.sh        # Build macOS DMG
+├── QuickMind-Setup.iss             # Inno Setup configuration
+└── README.md                       # Build documentation
 ```
 
-### 📦 Дистрибутив (dist/)
+### 📦 Distribution (dist/)
 ```
 dist/
-├── QuickMind-Setup-v2.1.0.exe          # Windows установщик
-├── QuickMind-macOS-ARM64-v2.1.0.zip    # macOS архив
-├── RELEASE-NOTES-v2.1.0.md             # Заметки к релизу
-├── README.md                           # Инструкции для пользователей
-├── README-macOS.md                     # Специфичные инструкции для macOS
-└── Install-QuickMind-macOS.sh          # Скрипт установки для macOS
+├── QuickMind-Setup-v2.1.0.exe          # Windows installer
+├── QuickMind-macOS-ARM64-v2.1.0.zip    # macOS archive
+├── RELEASE-NOTES-v2.1.0.md             # Release notes
+├── README.md                           # User instructions
+├── README-macOS.md                     # macOS-specific instructions
+└── Install-QuickMind-macOS.sh          # macOS installation script
 ```
 
 ### 🤖 GitHub Actions (.github/)
 ```
 .github/
 ├── workflows/
-│   ├── build-macos.yml      # Сборка macOS DMG
-│   └── release.yml          # Полный релиз всех платформ
-└── README.md               # Документация по CI/CD
+│   ├── build-macos.yml      # macOS DMG build
+│   └── release.yml          # Full release for all platforms
+└── README.md               # CI/CD documentation
 ```
 
-## 🎨 Дизайн и стили
+## 🎨 Design and Styles
 
-### Цветовая схема
-- **Фон**: #1E1E1E (темный)
-- **Панели**: #2A2A2A (темно-серый)
-- **Границы**: #333333 (приглушенный серый)
-- **Текст**: #FFFFFF (белый) / #B0B0B0 (светло-серый)
+### Color Scheme
+- **Background**: #1E1E1E (dark)
+- **Panels**: #2A2A2A (dark gray)
+- **Borders**: #333333 (muted gray)
+- **Text**: #FFFFFF (white) / #B0B0B0 (light gray)
 
-### Шрифт
-- **Основной**: Corus (используется во всем приложении)
+### Font
+- **Primary**: Corus (used throughout the application)
 
-### Компоненты
-- **Кнопки**: Единообразные размеры (MinHeight: 36px, Padding: 16,10)
-- **Поля ввода**: Консистентные размеры (MinHeight: 36px, Padding: 8px)
-- **Заголовки**: Одинаковая ширина в канбан-макете
+### Components
+- **Buttons**: Consistent sizing (MinHeight: 36px, Padding: 16,10)
+- **Input Fields**: Consistent sizing (MinHeight: 36px, Padding: 8px)
+- **Headers**: Equal width in kanban layout
 
-## 🗄️ База данных
-- **Тип**: SQLite с Entity Framework Core
-- **Модели**: FlashCard (Question, Answer, Topic, Status, CreatedAt, LastReviewed)
-- **Состояния карточек**: New, Learning, Known
+## 🗄️ Database
+- **Type**: SQLite with Entity Framework Core
+- **Models**: FlashCard (Question, Answer, Topic, Status, CreatedAt, LastReviewed)
+- **Card States**: New, Learning, Known
 
-## 🌍 Многоязычность
-- **Поддерживаемые языки**: English, Russian, Chinese
-- **Система**: Собственный LocalizationService с динамической сменой языка
+## 🌍 Multi-language Support
+- **Supported Languages**: English, Russian, Chinese
+- **System**: Custom LocalizationService with dynamic language switching
 
-## 🚀 Сборка и развертывание
+## 🚀 Build and Deployment
 
-### Локальная разработка
+### Local Development
 ```bash
 dotnet restore
 dotnet run
 ```
 
-### Создание релиза
+### Creating Release
 ```bash
-# Все платформы
+# All platforms
 ./installer/Build-All.ps1 -Version "2.1.0"
 
-# Только Windows
+# Windows only
 ./installer/Build-Windows-Installer.ps1 -Version "2.1.0"
 
-# Только macOS (требует macOS)
+# macOS only (requires macOS)
 ./installer/Build-macOS-Installer.sh
 ```
 
 ### GitHub Actions
-Автоматическая сборка при создании тега:
+Automatic build when creating a tag:
 ```bash
 git tag v2.1.0
 git push origin v2.1.0
 ```
 
-## 🔧 Требования к разработке
+## 🔧 Development Requirements
 - **.NET 9.0 SDK**
-- **Visual Studio 2022** или **JetBrains Rider**
-- **Git** для контроля версий
+- **Visual Studio 2022** or **JetBrains Rider**
+- **Git** for version control
 
-## 📝 Файлы конфигурации
-- **QuickMind.csproj**: NuGet пакеты и настройки проекта
-- **.gitignore**: Исключения для Git (bin/, obj/, publish/, dist/*.app/)
-- **app.manifest**: Манифест для Windows (DPI awareness)
+## 📝 Configuration Files
+- **QuickMind.csproj**: NuGet packages and project settings
+- **.gitignore**: Git exclusions (bin/, obj/, publish/, dist/*.app/)
+- **app.manifest**: Windows manifest (DPI awareness)
 
 ---
 
-💡 **Совет**: Для быстрого старта смотрите [README.md](README.md) в корне проекта. 
+💡 **Tip**: For quick start, see [README.md](README.md) in the project root. 
