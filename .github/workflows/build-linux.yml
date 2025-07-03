@@ -508,8 +508,9 @@ jobs:
         StartupWMClass=QuickMind
         DESKTOP_EOF
         
-        # Copy icon to build directory
-        cp Assets/QuickMindLogo.png flatpak-build/quickmind.png
+        # Copy and resize icon to build directory
+        sudo apt-get install -y imagemagick
+        convert Assets/QuickMindLogo.png -resize 256x256 flatpak-build/quickmind.png
         
         # Create manifest
         cat > flatpak-build/com.quickmind.QuickMind.yml << 'MANIFEST_EOF'
@@ -531,7 +532,6 @@ jobs:
           - name: quickmind
             buildsystem: simple
             build-commands:
-              - ls -la
               - install -Dm755 QuickMind /app/bin/QuickMind
               - find . -name "*.dll" -exec install -Dm755 {} /app/bin/ \;
               - find . -name "*.so*" -exec install -Dm755 {} /app/bin/ \; || true
