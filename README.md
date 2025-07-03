@@ -1,161 +1,226 @@
-# 📚 FlashCard App - Приложение для изучения с карточками
+# QuickMind 🧠
 
-Приложение для изучения различных тем с помощью флэш-карточек, реализованное на WPF (.NET 8).
+<div align="center">
+  <img src="Assets/QuickMindLogo.png" alt="QuickMind Logo" width="120" height="120">
+  
+  **A modern, minimalist flashcard application for efficient learning**
+  
+  [![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/)
+  [![Avalonia UI](https://img.shields.io/badge/Avalonia%20UI-11.0-blue.svg)](https://avaloniaui.net/)
+  [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.txt)
+</div>
 
-## ✨ Основные возможности
+## 📥 Download
 
-### 🎯 Функциональные возможности
-- **Создание карточек** - добавление вопросов и ответов с выбором темы
-- **Канбан-доска** - визуализация карточек по статусам (Новые / Изучаю / Знаю)
-- **Режим обучения** - последовательное изучение карточек с оценкой знаний
-- **Управление карточками** - редактирование и удаление существующих карточек
-- **Фильтрация** - по темам и статусам карточек
-- **Анимации** - плавные переходы и анимация переворота карточек
+Ready to start learning? Download QuickMind for your platform:
 
-### 🎨 Пользовательский интерфейс
-- Современный Material Design интерфейс
-- Цветовая индикация тем и статусов
-- Анимация переворота карточек при клике
-- Адаптивный дизайн
-- Контекстные меню для управления карточками
+<div align="center">
+  
+  [![Windows Download](https://img.shields.io/badge/Windows-Download-0078D4?style=for-the-badge&logo=windows&logoColor=white)](./dist/QuickMind-Setup-v2.1.1.exe)
+  [![macOS Download](https://img.shields.io/badge/macOS-Download-000000?style=for-the-badge&logo=apple&logoColor=white)](./dist/QuickMind-macOS-ARM64-v2.1.0.zip)
+  
+  **Windows**: `QuickMind-Setup-v2.1.1.exe` (32.56 MB)  
+  **macOS**: `QuickMind-macOS-ARM64-v2.1.0.zip` (44.83 MB)
+  
+  *Latest version: v2.1.1*
+  
+</div>
 
-### 💾 Хранение данных
-- SQLite база данных через Entity Framework Core
-- Автоматическое создание примеров карточек при первом запуске
-- Локальное хранение в папке пользователя
+### Installation Instructions
 
-## 🏗️ Архитектура проекта
+- **Windows**: Run the `.exe` installer and follow the setup wizard
+- **macOS**: Extract the `.zip` file and run the installation script (see [macOS README](./dist/README-macOS.md))
+- **Linux**: Build from source (instructions below)
 
-### Структура каталогов
-```
-FlashCardApp/
-├── Models/              # Модели данных
-│   ├── FlashCard.cs     # Основная модель карточки
-│   └── FlashCardContext.cs # Контекст базы данных
-├── Services/            # Бизнес-логика
-│   └── CardService.cs   # Сервис для работы с карточками
-├── ViewModels/          # MVVM ViewModels
-│   ├── BaseViewModel.cs
-│   ├── MainWindowViewModel.cs
-│   ├── AddCardDialogViewModel.cs
-│   └── StudyModeViewModel.cs
-├── Views/               # Окна приложения
-│   ├── AddCardDialog.xaml
-│   └── StudyModeWindow.xaml
-├── Controls/            # Пользовательские контролы
-│   └── FlipCardControl.xaml
-└── Converters.cs        # XAML конвертеры
-```
+---
 
-### Технологии
-- **.NET 8** - основная платформа
-- **WPF** - пользовательский интерфейс
-- **Entity Framework Core** - работа с базой данных
-- **SQLite** - локальная база данных
-- **MVVM Pattern** - архитектурный паттерн
+## ✨ Features
 
-## 🚀 Запуск приложения
+- **📚 Smart Flashcard System** - Organize your learning with three card states: New, Learning, and Known
+- **🎯 Study Mode** - Interactive learning experience with progress tracking
+- **🌍 Multi-language Support** - English, Russian, and Chinese interface
+- **🎨 Dark Minimalist Design** - Clean, distraction-free interface inspired by modern learning platforms
+- **📝 Easy Card Management** - Add, edit, and delete flashcards with live preview
+- **🏷️ Topic Organization** - Group cards by subjects or topics
+- **⚡ Cross-platform** - Runs on Windows, macOS, and Linux
 
-### Требования
-- .NET 8 SDK
-- Windows 10/11
+## 🚀 Getting Started
 
-### Установка и запуск
+### Prerequisites
+
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later
+- Git (for cloning the repository)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/QuickMind.git
+   cd QuickMind
+   ```
+
+2. **Restore dependencies**
+   ```bash
+   dotnet restore
+   ```
+
+3. **Run the application**
+   ```bash
+   dotnet run
+   ```
+
+### Building for Release
+
+#### Local Build
+To create a release build locally:
+
 ```bash
-# Клонирование репозитория
-git clone <repository-url>
-
-# Переход в каталог проекта
-cd FlashCardApp
-
-# Восстановление пакетов
-dotnet restore
-
-# Компиляция
-dotnet build
-
-# Запуск
-dotnet run
+dotnet publish -c Release -r win-x64 --self-contained
 ```
 
-## 📖 Использование
+Replace `win-x64` with your target platform:
+- Windows: `win-x64`, `win-arm64`
+- macOS: `osx-x64`, `osx-arm64`
+- Linux: `linux-x64`, `linux-arm64`
 
-### 1. Главное окно (Канбан-доска)
-- Отображает все карточки, сгруппированные по статусам
-- Кнопка "➕ Добавить карточку" для создания новых карточек
-- Фильтрация по темам в верхней панели
-- Клик по карточке показывает анимацию переворота с ответом
+#### Automated Installers
 
-### 2. Добавление карточки
-- Ввод вопроса и ответа (обязательные поля)
-- Выбор существующей темы или создание новой
-- Предварительный просмотр карточки
-- Валидация полей перед сохранением
+QuickMind includes GitHub Actions workflows for automatic installer creation:
 
-### 3. Режим обучения
-- Последовательное изучение карточек по выбранной теме
-- Показ вопроса → клик → показ ответа
-- Оценка знаний кнопками "Знаю" / "Не знаю"
-- Прогресс-бар показывает текущий прогресс
-- Навигация между карточками
-
-### 4. Управление карточками
-- Правый клик на карточке → контекстное меню
-- Редактирование существующих карточек
-- Удаление с подтверждением
-
-## 🎨 Особенности дизайна
-
-### Цветовая схема тем
-- **C#** - фиолетовый
-- **SQL** - синий  
-- **ASP.NET** - зеленый
-- **JavaScript** - желтый
-- **HTML** - оранжевый
-- **CSS** - индиго
-- **Другие** - серый
-
-### Статусы карточек
-- **Новые** - красный (🆕)
-- **Изучаю** - оранжевый (📖)  
-- **Знаю** - зеленый (✅)
-
-## 📝 Примеры карточек
-
-При первом запуске приложение автоматически создает примеры карточек:
-
-1. **C#**: "Что такое класс в C#?" 
-2. **SQL**: "Что такое SELECT в SQL?"
-3. **ASP.NET**: "Что такое MVC в ASP.NET?"
-
-## 🔄 База данных
-
-Приложение автоматически создает SQLite базу данных в:
-```
-%APPDATA%/FlashCardApp/flashcards.db
+**Windows Installer (Inno Setup)**
+```bash
+./installer/Build-Windows-Installer.ps1 -Version "2.1.0"
 ```
 
-### Схема таблицы FlashCards
-- `Id` - уникальный идентификатор
-- `Question` - текст вопроса
-- `Answer` - текст ответа  
-- `Topic` - тема карточки
-- `Status` - статус (New/Learning/Known)
-- `CreatedAt` - дата создания
-- `LastViewedAt` - дата последнего просмотра
-- `ViewCount` - количество просмотров
+**macOS DMG (Intel + Apple Silicon)**
+```bash
+./installer/Build-macOS-Installer.sh
+```
 
-## 🎯 Возможности для развития
+**All Platforms**
+```bash
+./installer/Build-All.ps1 -Version "2.1.0"
+```
 
-- Система интервального повторения (spaced repetition)
-- Импорт/экспорт карточек в различных форматах
-- Статистика обучения и прогресса
-- Теги для более гибкой категоризации
-- Поддержка изображений в карточках
-- Синхронизация между устройствами
-- Темная тема интерфейса
-- Поиск по карточкам
+#### GitHub Actions
 
-## 👨‍💻 Автор
+For automatic releases, simply create and push a version tag:
 
-Создано с использованием современных практик разработки WPF приложений и паттерна MVVM. 
+```bash
+git tag v2.1.0
+git push origin v2.1.0
+```
+
+This will trigger GitHub Actions to:
+- Build Windows installer (.exe)
+- Build macOS DMG files (Intel + Apple Silicon)
+- Create a GitHub Release with all files
+- Generate release notes automatically
+
+See [.github/README.md](.github/README.md) for detailed workflow documentation.
+
+## 📖 How to Use
+
+### First Launch
+1. Select your preferred language from the welcome screen
+2. Start adding your first flashcards using the "Add Card" button
+
+### Creating Flashcards
+1. Click **"Add Card"** in the main window
+2. Fill in the question and answer fields
+3. Choose an existing topic or create a new one
+4. Preview your card and save
+
+### Studying
+1. Click **"Study Mode"** to begin learning
+2. Read the question and try to recall the answer
+3. Click **"Show Answer"** to reveal the correct answer
+4. Rate your knowledge:
+   - **"Don't Know"** - moves card back to learning pile
+   - **"Know"** - moves card to known pile
+
+### Card Management
+- **New Cards**: Recently added cards waiting to be studied
+- **Learning Cards**: Cards you're actively studying
+- **Known Cards**: Cards you've mastered
+
+## 🛠️ Technology Stack
+
+- **Framework**: .NET 9.0
+- **UI Framework**: Avalonia UI 11.0
+- **Architecture**: MVVM (Model-View-ViewModel)
+- **Database**: SQLite with Entity Framework Core
+- **Styling**: Custom dark theme with Corus font
+
+## 🎨 Design Philosophy
+
+QuickMind follows a minimalist design approach inspired by modern learning platforms like YouLearn:
+
+- **Dark Theme**: Reduces eye strain during long study sessions
+- **Clean Typography**: Corus font for optimal readability
+- **Subtle Colors**: Muted color palette for distraction-free learning
+- **Intuitive Layout**: Three-column card organization for easy progress tracking
+
+## 📁 Project Structure
+
+```
+QuickMind/
+├── Assets/                 # Images and icons
+├── Converters/            # Value converters for data binding
+├── Models/                # Data models and database context
+├── Services/              # Business logic and services
+├── ViewModels/            # MVVM view models
+├── Views/                 # UI views and windows
+├── App.axaml             # Application styles and resources
+├── Program.cs            # Application entry point
+└── QuickMind.csproj      # Project configuration
+```
+
+## 🌍 Supported Languages
+
+- 🇺🇸 **English** - Full support
+- 🇷🇺 **Russian** - Full support  
+- 🇨🇳 **Chinese** - Full support
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how you can help:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow MVVM pattern for UI logic
+- Use meaningful commit messages
+- Add comments for complex logic
+- Test your changes across different platforms
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+## 🙏 Acknowledgments
+
+- [Avalonia UI](https://avaloniaui.net/) for the excellent cross-platform UI framework
+- [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/) for database management
+- The open-source community for inspiration and tools
+
+## 📞 Support
+
+If you encounter any issues or have questions:
+
+1. Check the [Issues](https://github.com/your-username/QuickMind/issues) page
+2. Create a new issue with detailed information
+3. Include your OS version and steps to reproduce
+
+---
+
+<div align="center">
+  Made with ❤️ for learners everywhere
+  
+  **Happy Learning! 🎓**
+</div> 

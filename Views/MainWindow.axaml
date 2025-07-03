@@ -1,0 +1,199 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuickMind.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="QuickMind.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="QuickMind"
+        Background="#1E1E1E">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Заголовок и фильтры -->
+        <Grid Grid.Row="0" Margin="10" Background="#2A2A2A">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Column="0" Text="QuickMind" FontSize="20" VerticalAlignment="Center" Foreground="#FFFFFF" FontFamily="Corus" Margin="20,0,0,0"/>
+            
+            <!-- Фильтр по темам -->
+            <ComboBox Grid.Column="1" 
+                      Margin="10,0" 
+                      MinWidth="150"
+                      ItemsSource="{Binding Topics}"
+                      SelectedItem="{Binding SelectedTopic}"/>
+            
+            <!-- Кнопки -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="10,0">
+                <Button Content="{Binding StudyModeLabel}" 
+                        Command="{Binding StartStudyCommand}"
+                        Margin="0,0,5,0"
+                        Classes="primary"/>
+                <Button Content="{Binding AddCardLabel}"
+                        Command="{Binding AddCardCommand}"
+                        Margin="0,0,5,0"/>
+                <Button Content="🌐 Lang" 
+                        Command="{Binding ShowLanguageSelectionCommand}"
+                        ToolTip.Tip="Language Selection"/>
+            </StackPanel>
+        </Grid>
+        
+        <!-- Основное содержимое -->
+        <Grid Grid.Row="1" Margin="10" Background="#1E1E1E">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Новые карточки -->
+            <Border Grid.Column="0" BorderBrush="#333333" BorderThickness="1" Margin="5" Background="#252526">
+                <StackPanel>
+                    <Border Background="#404040" Margin="10,10,10,5">
+                        <TextBlock Text="{Binding NewLabel}" 
+                                   HorizontalAlignment="Center" 
+                                   Padding="10" 
+                                   Foreground="#FFFFFF"
+                                   FontFamily="Corus"/>
+                    </Border>
+                    <ListBox ItemsSource="{Binding NewCards}" Margin="5" Background="#252526">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#333333" BorderThickness="1" Margin="2" Padding="5" Background="#2A2A2A">
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <TextBlock Grid.Column="0" Text="{Binding Question}" TextWrapping="Wrap" Foreground="#FFFFFF"/>
+                                            
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                <Button Content="Edit" ToolTip.Tip="Edit"
+                                                        Command="{Binding $parent[Window].DataContext.EditCardCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        FontSize="10" Margin="2,0"/>
+                                                <Button Content="Del" ToolTip.Tip="Delete"
+                                                        Command="{Binding $parent[Window].DataContext.DeleteCardCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        FontSize="10" Margin="2,0"
+                                                        Classes="danger"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock Text="{Binding Topic}" FontStyle="Italic" FontSize="12" Foreground="#B0B0B0"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+            
+            <!-- Изучаемые карточки -->
+            <Border Grid.Column="1" BorderBrush="#333333" BorderThickness="1" Margin="5" Background="#252526">
+                <StackPanel>
+                    <Border Background="#505050" Margin="10,10,10,5">
+                        <TextBlock Text="{Binding LearningLabel}" 
+                                   HorizontalAlignment="Center" 
+                                   Padding="10" 
+                                   Foreground="#FFFFFF"
+                                   FontFamily="Corus"/>
+                    </Border>
+                    <ListBox ItemsSource="{Binding LearningCards}" Margin="5" Background="#252526">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#333333" BorderThickness="1" Margin="2" Padding="5" Background="#2A2A2A">
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <TextBlock Grid.Column="0" Text="{Binding Question}" TextWrapping="Wrap" Foreground="#FFFFFF"/>
+                                            
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                <Button Content="Edit" ToolTip.Tip="Edit"
+                                                        Command="{Binding $parent[Window].DataContext.EditCardCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        FontSize="10" Margin="2,0"/>
+                                                <Button Content="Del" ToolTip.Tip="Delete"
+                                                        Command="{Binding $parent[Window].DataContext.DeleteCardCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        FontSize="10" Margin="2,0"
+                                                        Classes="danger"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock Text="{Binding Topic}" FontStyle="Italic" FontSize="12" Foreground="#B0B0B0"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+            
+            <!-- Изученные карточки -->
+            <Border Grid.Column="2" BorderBrush="#333333" BorderThickness="1" Margin="5" Background="#252526">
+                <StackPanel>
+                    <Border Background="#404040" Margin="10,10,10,5">
+                        <TextBlock Text="{Binding KnownLabel}" 
+                                   HorizontalAlignment="Center" 
+                                   Padding="10" 
+                                   Foreground="#FFFFFF"
+                                   FontFamily="Corus"/>
+                    </Border>
+                    <ListBox ItemsSource="{Binding KnownCards}" Margin="5" Background="#252526">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#333333" BorderThickness="1" Margin="2" Padding="5" Background="#2A2A2A">
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <TextBlock Grid.Column="0" Text="{Binding Question}" TextWrapping="Wrap" Foreground="#FFFFFF"/>
+                                            
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                <Button Content="Edit" ToolTip.Tip="Edit"
+                                                        Command="{Binding $parent[Window].DataContext.EditCardCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        FontSize="10" Margin="2,0"/>
+                                                <Button Content="Del" ToolTip.Tip="Delete"
+                                                        Command="{Binding $parent[Window].DataContext.DeleteCardCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        FontSize="10" Margin="2,0"
+                                                        Classes="danger"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock Text="{Binding Topic}" FontStyle="Italic" FontSize="12" Foreground="#B0B0B0"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+
+</Window>

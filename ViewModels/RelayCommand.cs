@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Input;
 
-namespace FlashCardApp.ViewModels
+namespace QuickMind.ViewModels
 {
     public class RelayCommand : ICommand
     {
@@ -14,11 +14,7 @@ namespace FlashCardApp.ViewModels
             _canExecute = canExecute;
         }
 
-        public event EventHandler? CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
+        public event EventHandler? CanExecuteChanged;
 
         public bool CanExecute(object? parameter)
         {
@@ -28,6 +24,11 @@ namespace FlashCardApp.ViewModels
         public void Execute(object? parameter)
         {
             _execute();
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -42,11 +43,7 @@ namespace FlashCardApp.ViewModels
             _canExecute = canExecute;
         }
 
-        public event EventHandler? CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
+        public event EventHandler? CanExecuteChanged;
 
         public bool CanExecute(object? parameter)
         {
@@ -56,6 +53,11 @@ namespace FlashCardApp.ViewModels
         public void Execute(object? parameter)
         {
             _execute((T?)parameter);
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 } 

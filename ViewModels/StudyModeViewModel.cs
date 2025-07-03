@@ -1,13 +1,17 @@
-using FlashCardApp.Models;
-using FlashCardApp.Services;
+using QuickMind.Models;
+using QuickMind.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
-namespace FlashCardApp.ViewModels
+namespace QuickMind.ViewModels
 {
-    public class StudyModeViewModel : BaseViewModel
+    public class StudyModeViewModel : ViewModelBase
     {
         private readonly CardService _cardService;
+        private readonly LocalizationService _localizationService;
         private List<FlashCard> _studyCards;
         private int _currentIndex;
         private FlashCard? _currentCard;
@@ -17,13 +21,16 @@ namespace FlashCardApp.ViewModels
         public StudyModeViewModel(CardService cardService, string? topic = null)
         {
             _cardService = cardService;
-            _studyTopic = topic ?? "Все темы";
+            _localizationService = LocalizationService.Instance;
+            _studyTopic = topic ?? _localizationService.GetString("All");
             _studyCards = new List<FlashCard>();
             _currentIndex = 0;
             _showAnswer = false;
 
+            _localizationService.LanguageChanged += OnLanguageChanged;
+
             InitializeCommands();
-            LoadStudyCards();
+            _ = LoadStudyCardsAsync();
         }
 
         public FlashCard? CurrentCard
@@ -60,31 +67,47 @@ namespace FlashCardApp.ViewModels
 
         public bool CanGoPrevious => CurrentIndex > 0;
 
-        // Команды
-        public RelayCommand ShowAnswerCommand { get; private set; }
-        public RelayCommand KnowCommand { get; private set; }
-        public RelayCommand DontKnowCommand { get; private set; }
-        public RelayCommand NextCardCommand { get; private set; }
-        public RelayCommand PreviousCardCommand { get; private set; }
-        public RelayCommand RestartCommand { get; private set; }
+        public string StudyModeLabel => _localizationService.GetString("StudyMode");
+        public string QuestionLabel => _localizationService.GetString("Question");
+        public string AnswerLabel => _localizationService.GetString("Answer");
+        public string ShowAnswerLabel => _localizationService.GetString("ShowAnswer");
+        public string KnowLabel => _localizationService.GetString("Know");
+        public string DontKnowLabel => _localizationService.GetString("DontKnow");
+        public string NextLabel => _localizationService.GetString("Next");
+        public string PreviousLabel => _localizationService.GetString("Previous");
+        public string RestartLabel => _localizationService.GetString("Restart");
+        public string NoCardsLabel => _localizationService.GetString("NoCardsToStudy");
+        public string AddCardsLabel => _localizationService.GetString("AddCardsOrSelectTopic");
+        public string ClickToShowAnswerLabel => _localizationService.GetString("ClickToShowAnswer");
+        public string RateKnowledgeLabel => _localizationService.GetString("RateKnowledge");
+
+        public ICommand ShowAnswerCommand { get; private set; } = null!;
+        public ICommand KnowCommand { get; private set; } = null!;
+        public ICommand DontKnowCommand { get; private set; } = null!;
+        public ICommand NextCardCommand { get; private set; } = null!;
+        public ICommand PreviousCardCommand { get; private set; } = null!;
+        public ICommand RestartCommand { get; private set; } = null!;
+
+        public event Action? RequestClose;
 
         private void InitializeCommands()
         {
             ShowAnswerCommand = new RelayCommand(ShowAnswerAction);
-            KnowCommand = new RelayCommand(MarkAsKnown);
-            DontKnowCommand = new RelayCommand(MarkAsLearning);
+            KnowCommand = new RelayCommand(async () => await MarkAsKnownAsync());
+            DontKnowCommand = new RelayCommand(async () => await MarkAsLearningAsync());
             NextCardCommand = new RelayCommand(NextCard, () => CanGoNext);
             PreviousCardCommand = new RelayCommand(PreviousCard, () => CanGoPrevious);
             RestartCommand = new RelayCommand(Restart);
         }
 
-        private async void LoadStudyCards()
+        private async Task LoadStudyCardsAsync()
         {
             try
             {
                 List<FlashCard> allCards;
                 
-                if (_studyTopic == "Все темы" || string.IsNullOrEmpty(_studyTopic))
+                var allTopicsString = _localizationService.GetString("All");
+                if (_studyTopic == allTopicsString || string.IsNullOrEmpty(_studyTopic))
                 {
                     allCards = await _cardService.GetAllCardsAsync();
                 }
@@ -93,7 +116,6 @@ namespace FlashCardApp.ViewModels
                     allCards = await _cardService.GetCardsByTopicAsync(_studyTopic);
                 }
 
-                // Приоритизируем новые и изучаемые карточки
                 _studyCards = allCards
                     .OrderBy(c => c.Status == CardStatus.Known ? 1 : 0)
                     .ThenBy(c => c.LastViewedAt ?? DateTime.MinValue)
@@ -106,12 +128,12 @@ namespace FlashCardApp.ViewModels
                     OnPropertyChanged(nameof(HasCards));
                     OnPropertyChanged(nameof(CanGoNext));
                     OnPropertyChanged(nameof(CanGoPrevious));
+                    OnPropertyChanged(nameof(TotalCards));
                 }
             }
             catch (Exception ex)
             {
-                // Обработка ошибок
-                System.Windows.MessageBox.Show($"Ошибка при загрузке карточек: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error loading study cards: {ex.Message}");
             }
         }
 
@@ -120,7 +142,7 @@ namespace FlashCardApp.ViewModels
             ShowAnswer = true;
         }
 
-        private async void MarkAsKnown()
+        private async Task MarkAsKnownAsync()
         {
             if (CurrentCard != null)
             {
@@ -130,7 +152,7 @@ namespace FlashCardApp.ViewModels
             }
         }
 
-        private async void MarkAsLearning()
+        private async Task MarkAsLearningAsync()
         {
             if (CurrentCard != null)
             {
@@ -150,11 +172,13 @@ namespace FlashCardApp.ViewModels
                 OnPropertyChanged(nameof(Progress));
                 OnPropertyChanged(nameof(CanGoNext));
                 OnPropertyChanged(nameof(CanGoPrevious));
+                
+                ((RelayCommand)NextCardCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)PreviousCardCommand).RaiseCanExecuteChanged();
             }
             else if (CurrentIndex == TotalCards - 1)
             {
-                // Достигнут конец
-                System.Windows.MessageBox.Show("Вы завершили изучение всех карточек!", "Поздравляем!");
+                System.Diagnostics.Debug.WriteLine("Study session completed!");
             }
         }
 
@@ -168,6 +192,9 @@ namespace FlashCardApp.ViewModels
                 OnPropertyChanged(nameof(Progress));
                 OnPropertyChanged(nameof(CanGoNext));
                 OnPropertyChanged(nameof(CanGoPrevious));
+                
+                ((RelayCommand)NextCardCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)PreviousCardCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -181,7 +208,36 @@ namespace FlashCardApp.ViewModels
                 OnPropertyChanged(nameof(Progress));
                 OnPropertyChanged(nameof(CanGoNext));
                 OnPropertyChanged(nameof(CanGoPrevious));
+                
+                ((RelayCommand)NextCardCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)PreviousCardCommand).RaiseCanExecuteChanged();
             }
+        }
+
+        private void OnLanguageChanged()
+        {
+            OnPropertyChanged(nameof(StudyModeLabel));
+            OnPropertyChanged(nameof(QuestionLabel));
+            OnPropertyChanged(nameof(AnswerLabel));
+            OnPropertyChanged(nameof(ShowAnswerLabel));
+            OnPropertyChanged(nameof(KnowLabel));
+            OnPropertyChanged(nameof(DontKnowLabel));
+            OnPropertyChanged(nameof(NextLabel));
+            OnPropertyChanged(nameof(PreviousLabel));
+            OnPropertyChanged(nameof(RestartLabel));
+            OnPropertyChanged(nameof(NoCardsLabel));
+            OnPropertyChanged(nameof(AddCardsLabel));
+            OnPropertyChanged(nameof(ClickToShowAnswerLabel));
+            OnPropertyChanged(nameof(RateKnowledgeLabel));
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _localizationService.LanguageChanged -= OnLanguageChanged;
+            }
+            base.Dispose(disposing);
         }
     }
 } 

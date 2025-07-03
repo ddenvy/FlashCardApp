@@ -1,15 +1,16 @@
-using FlashCardApp.Models;
-using FlashCardApp.Services;
+using QuickMind.Models;
+using QuickMind.Services;
 using System;
 using System.Collections.ObjectModel;
-using System.Windows;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace FlashCardApp.ViewModels
+namespace QuickMind.ViewModels
 {
-    public class AddCardDialogViewModel : BaseViewModel
+    public class AddCardDialogViewModel : ViewModelBase
     {
         private readonly CardService _cardService;
+        private readonly LocalizationService _localizationService;
         private readonly FlashCard? _editingCard;
         private string _question = string.Empty;
         private string _answer = string.Empty;
@@ -20,11 +21,14 @@ namespace FlashCardApp.ViewModels
         public AddCardDialogViewModel(CardService cardService, FlashCard? editingCard = null)
         {
             _cardService = cardService;
+            _localizationService = LocalizationService.Instance;
             _editingCard = editingCard;
             _isEditMode = editingCard != null;
             
+            _localizationService.LanguageChanged += OnLanguageChanged;
+            
             InitializeCommands();
-            LoadExistingTopics();
+            _ = LoadExistingTopicsAsync();
             
             if (_editingCard != null)
             {
@@ -41,7 +45,7 @@ namespace FlashCardApp.ViewModels
             { 
                 if (SetProperty(ref _question, value))
                 {
-                    CommandManager.InvalidateRequerySuggested();
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -53,7 +57,7 @@ namespace FlashCardApp.ViewModels
             { 
                 if (SetProperty(ref _answer, value))
                 {
-                    CommandManager.InvalidateRequerySuggested();
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -65,7 +69,7 @@ namespace FlashCardApp.ViewModels
             { 
                 if (SetProperty(ref _selectedTopic, value))
                 {
-                    CommandManager.InvalidateRequerySuggested();
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -81,7 +85,7 @@ namespace FlashCardApp.ViewModels
                     {
                         SelectedTopic = value;
                     }
-                    CommandManager.InvalidateRequerySuggested();
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -94,8 +98,18 @@ namespace FlashCardApp.ViewModels
 
         public ObservableCollection<string> ExistingTopics { get; } = new ObservableCollection<string>();
 
-        public RelayCommand SaveCommand { get; private set; }
-        public RelayCommand CancelCommand { get; private set; }
+        public string DialogTitle => IsEditMode ? _localizationService.GetString("EditCard") : _localizationService.GetString("AddCard");
+        public string QuestionLabel => _localizationService.GetString("Question");
+        public string AnswerLabel => _localizationService.GetString("Answer");
+        public string TopicLabel => _localizationService.GetString("Topic");
+        public string NewTopicLabel => _localizationService.GetString("NewTopic");
+        public string PreviewLabel => _localizationService.GetString("Preview");
+        public string SaveLabel => _localizationService.GetString("Save");
+        public string CancelLabel => _localizationService.GetString("Cancel");
+        public string OrCreateNewLabel => _localizationService.GetString("OrCreateNew");
+
+        public ICommand SaveCommand { get; private set; } = null!;
+        public ICommand CancelCommand { get; private set; } = null!;
 
         private bool? _dialogResult;
         public bool? DialogResult 
@@ -104,20 +118,29 @@ namespace FlashCardApp.ViewModels
             set => SetProperty(ref _dialogResult, value);
         }
 
+        public event Action? RequestClose;
+
         private void InitializeCommands()
         {
-            SaveCommand = new RelayCommand(Save, CanSave);
+            SaveCommand = new RelayCommand(async () => await SaveAsync(), CanSave);
             CancelCommand = new RelayCommand(Cancel);
         }
 
-        private async void LoadExistingTopics()
+        private async Task LoadExistingTopicsAsync()
         {
-            var topics = await _cardService.GetAllTopicsAsync();
-            ExistingTopics.Clear();
-            
-            foreach (var topic in topics)
+            try
             {
-                ExistingTopics.Add(topic);
+                var topics = await _cardService.GetAllTopicsAsync();
+                ExistingTopics.Clear();
+                
+                foreach (var topic in topics)
+                {
+                    ExistingTopics.Add(topic);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading topics: {ex.Message}");
             }
         }
 
@@ -128,7 +151,7 @@ namespace FlashCardApp.ViewModels
                    !string.IsNullOrWhiteSpace(SelectedTopic);
         }
 
-        private async void Save()
+        private async Task SaveAsync()
         {
             try
             {
@@ -155,24 +178,40 @@ namespace FlashCardApp.ViewModels
                 }
 
                 DialogResult = true;
-                CloseDialog();
+                RequestClose?.Invoke();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при сохранении карточки: {ex.Message}", 
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"Error saving card: {ex.Message}");
             }
         }
 
         private void Cancel()
         {
             DialogResult = false;
-            CloseDialog();
+            RequestClose?.Invoke();
         }
 
-        private void CloseDialog()
+        private void OnLanguageChanged()
         {
-            // Закрытие происходит автоматически через DialogResult
+            OnPropertyChanged(nameof(DialogTitle));
+            OnPropertyChanged(nameof(QuestionLabel));
+            OnPropertyChanged(nameof(AnswerLabel));
+            OnPropertyChanged(nameof(TopicLabel));
+            OnPropertyChanged(nameof(NewTopicLabel));
+            OnPropertyChanged(nameof(PreviewLabel));
+            OnPropertyChanged(nameof(SaveLabel));
+            OnPropertyChanged(nameof(CancelLabel));
+            OnPropertyChanged(nameof(OrCreateNewLabel));
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _localizationService.LanguageChanged -= OnLanguageChanged;
+            }
+            base.Dispose(disposing);
         }
     }
 } 

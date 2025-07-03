@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.IO;
 
-namespace FlashCardApp.Models
+namespace QuickMind.Models
 {
     public class FlashCardContext : DbContext
     {

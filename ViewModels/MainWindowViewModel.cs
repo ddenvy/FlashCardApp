@@ -1,405 +1,380 @@
-using FlashCardApp.Models;
-using FlashCardApp.Services;
-using FlashCardApp.Views;
+﻿using QuickMind.Models;
+using QuickMind.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
-using System.Windows.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
-namespace FlashCardApp.ViewModels
+namespace QuickMind.ViewModels;
+
+public partial class MainWindowViewModel : ViewModelBase
 {
-    public class MainWindowViewModel : BaseViewModel
+    private readonly CardService _cardService;
+    private readonly LocalizationService _localizationService;
+    private ObservableCollection<FlashCard> _allCards;
+    private ObservableCollection<string> _topics;
+    private string _selectedTopic = "All";
+    private CardStatus? _selectedStatus = null;
+    private LanguageItem _currentLanguage;
+    
+    private ObservableCollection<FlashCard> _newCards;
+    private ObservableCollection<FlashCard> _learningCards;
+    private ObservableCollection<FlashCard> _knownCards;
+
+    public MainWindowViewModel()
     {
-        private readonly CardService _cardService;
-        private readonly LocalizationService _localizationService;
-        private ObservableCollection<FlashCard> _allCards;
-        private ObservableCollection<string> _topics;
-        private string _selectedTopic = "All";
-        private CardStatus? _selectedStatus = null;
-        private string _currentLanguage;
+        _cardService = new CardService();
+        _localizationService = LocalizationService.Instance;
+        _allCards = new ObservableCollection<FlashCard>();
+        _topics = new ObservableCollection<string>();
+        _newCards = new ObservableCollection<FlashCard>();
+        _learningCards = new ObservableCollection<FlashCard>();
+        _knownCards = new ObservableCollection<FlashCard>();
         
-        // Отдельные коллекции для каждого статуса карточек
-        private ObservableCollection<FlashCard> _newCards;
-        private ObservableCollection<FlashCard> _learningCards;
-        private ObservableCollection<FlashCard> _knownCards;
+        _currentLanguage = _localizationService.AvailableLanguages.FirstOrDefault(l => l.Code == _localizationService.CurrentCulture.Name) 
+                          ?? _localizationService.AvailableLanguages.First();
+        _localizationService.LanguageChanged += OnLanguageChanged;
+        
+        _cardService.CardsChanged += OnCardsChanged;
+        
+        InitializeCommands();
+        _ = LoadDataAsync();
+    }
 
-        public MainWindowViewModel()
+    public ObservableCollection<FlashCard> AllCards
+    {
+        get => _allCards;
+        set => SetProperty(ref _allCards, value);
+    }
+
+    public ObservableCollection<string> Topics
+    {
+        get => _topics;
+        set => SetProperty(ref _topics, value);
+    }
+
+    public string SelectedTopic
+    {
+        get => _selectedTopic;
+        set
         {
-            _cardService = new CardService();
-            _localizationService = LocalizationService.Instance;
-            _allCards = new ObservableCollection<FlashCard>();
-            _topics = new ObservableCollection<string>();
-            _newCards = new ObservableCollection<FlashCard>();
-            _learningCards = new ObservableCollection<FlashCard>();
-            _knownCards = new ObservableCollection<FlashCard>();
+            if (SetProperty(ref _selectedTopic, value))
+            {
+                FilterCards();
+            }
+        }
+    }
+
+    public CardStatus? SelectedStatus
+    {
+        get => _selectedStatus;
+        set
+        {
+            if (SetProperty(ref _selectedStatus, value))
+            {
+                FilterCards();
+                OnPropertyChanged(nameof(IsAllStatusSelected));
+            }
+        }
+    }
+
+    public bool IsAllStatusSelected
+    {
+        get => _selectedStatus == null;
+        set
+        {
+            if (value)
+            {
+                SelectedStatus = null;
+            }
+        }
+    }
+
+    public LanguageItem CurrentLanguage
+    {
+        get => _currentLanguage;
+        set
+        {
+            if (SetProperty(ref _currentLanguage, value))
+            {
+                _localizationService.SetLanguage(value.Code);
+            }
+        }
+    }
+
+    public List<LanguageItem> AvailableLanguages => _localizationService.AvailableLanguages;
+
+    public string NewLabel => _localizationService.GetString("New");
+    public string LearningLabel => _localizationService.GetString("Learning");
+    public string KnownLabel => _localizationService.GetString("Known");
+    public string AddCardLabel => _localizationService.GetString("AddCard");
+    public string StudyModeLabel => _localizationService.GetString("StudyMode");
+    public string EditLabel => _localizationService.GetString("Edit");
+    public string DeleteLabel => _localizationService.GetString("Delete");
+
+    public ICommand AddCardCommand { get; private set; } = null!;
+    public ICommand RefreshCommand { get; private set; } = null!;
+            public ICommand EditCardCommand { get; private set; } = null!;
+        public ICommand DeleteCardCommand { get; private set; } = null!;
+        public ICommand StartStudyCommand { get; private set; } = null!;
+        public ICommand ShowLanguageSelectionCommand { get; private set; } = null!;
+
+    public ObservableCollection<FlashCard> NewCards => _newCards;
+    public ObservableCollection<FlashCard> LearningCards => _learningCards;
+    public ObservableCollection<FlashCard> KnownCards => _knownCards;
+
+    private void InitializeCommands()
+    {
+        AddCardCommand = new RelayCommand(async () => await AddCardAsync());
+        RefreshCommand = new RelayCommand(async () => await LoadDataAsync());
+        EditCardCommand = new RelayCommand<FlashCard>(async (card) => await EditCardAsync(card));
+        DeleteCardCommand = new RelayCommand<FlashCard>(async (card) => await DeleteCardAsync(card));
+        StartStudyCommand = new RelayCommand(StartStudy);
+        ShowLanguageSelectionCommand = new RelayCommand(async () => await ShowLanguageSelectionAsync());
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            await _cardService.InitializeDatabaseAsync();
             
-            // Инициализация языка
-            _currentLanguage = _localizationService.CurrentCulture.Name;
-            _localizationService.LanguageChanged += OnLanguageChanged;
+            var cards = await _cardService.GetAllCardsAsync();
             
-            InitializeCommands();
-            LoadDataAsync();
-        }
-
-        public ObservableCollection<FlashCard> AllCards
-        {
-            get => _allCards;
-            set => SetProperty(ref _allCards, value);
-        }
-
-        public ObservableCollection<string> Topics
-        {
-            get => _topics;
-            set => SetProperty(ref _topics, value);
-        }
-
-        public string SelectedTopic
-        {
-            get => _selectedTopic;
-            set
+            AllCards.Clear();
+            foreach (var card in cards)
             {
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine($"SelectedTopic changing from '{_selectedTopic}' to '{value}'");
-#endif
-                if (SetProperty(ref _selectedTopic, value))
-                {
-#if DEBUG
-                    System.Diagnostics.Debug.WriteLine($"SelectedTopic changed to '{value}', calling FilterCards()");
-#endif
-                    FilterCards();
-                }
+                AllCards.Add(card);
             }
-        }
 
-        public CardStatus? SelectedStatus
-        {
-            get => _selectedStatus;
-            set
+            var topics = await _cardService.GetAllTopicsAsync();
+            
+            var currentSelectedTopic = SelectedTopic;
+            
+            Topics.Clear();
+            var allTopicsString = _localizationService.GetString("All");
+            Topics.Add(allTopicsString);
+            foreach (var topic in topics)
             {
-                if (SetProperty(ref _selectedStatus, value))
-                {
-                    FilterCards();
-                    OnPropertyChanged(nameof(IsAllStatusSelected));
-                }
+                Topics.Add(topic);
             }
-        }
-
-        public bool IsAllStatusSelected
-        {
-            get => _selectedStatus == null;
-            set
+            
+            if (!string.IsNullOrEmpty(currentSelectedTopic) && Topics.Contains(currentSelectedTopic))
             {
-                if (value)
-                {
-                    SelectedStatus = null;
-                }
-            }
-        }
-
-        public string CurrentLanguage
-        {
-            get => _currentLanguage;
-            set
-            {
-                if (SetProperty(ref _currentLanguage, value))
-                {
-                    _localizationService.SetLanguage(value);
-                }
-            }
-        }
-
-        // Команды
-        public RelayCommand AddCardCommand { get; private set; }
-        public RelayCommand<FlashCard> EditCardCommand { get; private set; }
-        public RelayCommand<FlashCard> DeleteCardCommand { get; private set; }
-        public RelayCommand<string> StartStudyModeCommand { get; private set; }
-        public RelayCommand RefreshCommand { get; private set; }
-
-        // Группировка карточек по темам для канбан-доски
-        public ObservableCollection<FlashCard> NewCards => _newCards;
-        public ObservableCollection<FlashCard> LearningCards => _learningCards;
-        public ObservableCollection<FlashCard> KnownCards => _knownCards;
-
-        private void InitializeCommands()
-        {
-            AddCardCommand = new RelayCommand(AddCard);
-            EditCardCommand = new RelayCommand<FlashCard>(EditCard);
-            DeleteCardCommand = new RelayCommand<FlashCard>(DeleteCard);
-            StartStudyModeCommand = new RelayCommand<string>(StartStudyMode);
-            RefreshCommand = new RelayCommand(() => LoadDataAsync());
-        }
-
-        private async void LoadDataAsync()
-        {
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine("LoadDataAsync started");
-#endif            
-            try
-            {
-                await _cardService.InitializeDatabaseAsync();
-                
-                var cards = await _cardService.GetAllCardsAsync();
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine($"Loaded {cards.Count} cards from database");
-#endif
-                
-                // Обновляем коллекции в UI потоке
-                await Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    AllCards.Clear();
-                    foreach (var card in cards)
-                    {
-                        AllCards.Add(card);
-                    }
-#if DEBUG
-                    System.Diagnostics.Debug.WriteLine($"AllCards.Count after loading: {AllCards.Count}");
-#endif
-                });
-
-                var topics = await _cardService.GetAllTopicsAsync();
-                
-                // Обновляем темы в UI потоке
-                await Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    // Сохраняем текущую выбранную тему
-                    var currentSelectedTopic = SelectedTopic;
-#if DEBUG
-                    System.Diagnostics.Debug.WriteLine($"Current selected topic before update: {currentSelectedTopic}");
-#endif
-                    
-                    Topics.Clear();
-                    var allTopicsString = _localizationService.GetString("All");
-                    Topics.Add(allTopicsString);
-                    foreach (var topic in topics)
-                    {
-                        Topics.Add(topic);
-                    }
-                    
-                    // Восстанавливаем выбранную тему, если она все еще существует
-                    if (!string.IsNullOrEmpty(currentSelectedTopic) && Topics.Contains(currentSelectedTopic))
-                    {
-                        SelectedTopic = currentSelectedTopic;
-#if DEBUG
-                        System.Diagnostics.Debug.WriteLine($"Restored selected topic: {currentSelectedTopic}");
-#endif
-                    }
-                    else
-                    {
-                        SelectedTopic = allTopicsString;
-#if DEBUG
-                        System.Diagnostics.Debug.WriteLine($"Selected topic reset to '{allTopicsString}'");
-#endif
-                    }
-                });
-
-                // Обновляем группированные коллекции
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine("Calling UpdateGroupedCards from LoadDataAsync");
-#endif
-                UpdateGroupedCards();
-            }
-            catch (Exception ex)
-            {
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine($"Error in LoadDataAsync: {ex.Message}");
-#endif
-            }
-        }
-
-        private void FilterCards()
-        {
-            UpdateGroupedCards();
-        }
-
-        private void UpdateGroupedCards()
-        {
-            // Убеждаемся, что обновления происходят в UI потоке
-            if (Application.Current.Dispatcher.CheckAccess())
-            {
-                UpdateGroupedCardsInternal();
+                SelectedTopic = currentSelectedTopic;
             }
             else
             {
-                Application.Current.Dispatcher.Invoke(UpdateGroupedCardsInternal);
+                SelectedTopic = allTopicsString;
             }
+
+            UpdateGroupedCards();
         }
-
-        private void UpdateGroupedCardsInternal()
+        catch (Exception ex)
         {
-            var filteredCards = AllCards.Where(FilterCard).ToList();
-            
-#if DEBUG
-            // Отладочная информация
-            System.Diagnostics.Debug.WriteLine($"UpdateGroupedCards: AllCards.Count = {AllCards.Count}, FilteredCards.Count = {filteredCards.Count}");
-#endif
-
-            // Обновляем коллекцию новых карточек
-            _newCards.Clear();
-            foreach (var card in filteredCards.Where(c => c.Status == CardStatus.New))
-            {
-                _newCards.Add(card);
-            }
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine($"NewCards after update: {_newCards.Count}");
-#endif
-
-            // Обновляем коллекцию изучаемых карточек
-            _learningCards.Clear();
-            foreach (var card in filteredCards.Where(c => c.Status == CardStatus.Learning))
-            {
-                _learningCards.Add(card);
-            }
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine($"LearningCards after update: {_learningCards.Count}");
-#endif
-
-            // Обновляем коллекцию изученных карточек
-            _knownCards.Clear();
-            foreach (var card in filteredCards.Where(c => c.Status == CardStatus.Known))
-            {
-                _knownCards.Add(card);
-            }
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine($"KnownCards after update: {_knownCards.Count}");
-#endif
-        }
-
-        private bool FilterCard(FlashCard card)
-        {
-            var allTopicsString = _localizationService.GetString("All");
-            bool topicMatch = SelectedTopic == allTopicsString || card.Topic == SelectedTopic;
-            bool statusMatch = SelectedStatus == null || card.Status == SelectedStatus;
-            
-            return topicMatch && statusMatch;
-        }
-
-        private void AddCard()
-        {
-            var dialog = new AddCardDialog();
-            var viewModel = new AddCardDialogViewModel(_cardService);
-            dialog.DataContext = viewModel;
-            
-            if (dialog.ShowDialog() == true)
-            {
-                LoadDataAsync();
-            }
-        }
-
-        private void EditCard(FlashCard? card)
-        {
-            if (card == null) return;
-
-            var dialog = new AddCardDialog();
-            var viewModel = new AddCardDialogViewModel(_cardService, card);
-            dialog.DataContext = viewModel;
-            dialog.Title = _localizationService.GetString("EditCard");
-            
-            if (dialog.ShowDialog() == true)
-            {
-                LoadDataAsync();
-            }
-        }
-
-        private async void DeleteCard(FlashCard? card)
-        {
-            if (card == null) return;
-
-            #if DEBUG
-                System.Diagnostics.Debug.WriteLine($"DeleteCard called for card: {card.Question}");
-#endif
-
-            var result = MessageBox.Show(
-                string.Format(_localizationService.GetString("DeleteConfirmation"), card.Question),
-                _localizationService.GetString("DeleteConfirmationTitle"),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                try
-                {
-#if DEBUG
-                    System.Diagnostics.Debug.WriteLine($"Deleting card with ID: {card.Id}");
-#endif
-                    await _cardService.DeleteCardAsync(card.Id);
-#if DEBUG
-                    System.Diagnostics.Debug.WriteLine("Card deleted from database, calling LoadDataAsync...");
-#endif
-                    LoadDataAsync();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        string.Format(_localizationService.GetString("DeleteError"), ex.Message), 
-                        _localizationService.GetString("Error"), 
-                        MessageBoxButton.OK, 
-                        MessageBoxImage.Error);
-#if DEBUG
-                    System.Diagnostics.Debug.WriteLine($"Error deleting card: {ex.Message}");
-#endif
-                }
-            }
-        }
-
-        private void StartStudyMode(string? topic)
-        {
-            var studyWindow = new StudyModeWindow();
-            var viewModel = new StudyModeViewModel(_cardService, topic);
-            studyWindow.DataContext = viewModel;
-            studyWindow.Show();
-        }
-
-        private void OnLanguageChanged()
-        {
-            // Обновляем текущий язык
-            SetProperty(ref _currentLanguage, _localizationService.CurrentCulture.Name, nameof(CurrentLanguage));
-            
-            // Обновляем строку "All" в соответствии с новым языком
-            var allTopicsString = _localizationService.GetString("All");
-            
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                // Сохраняем выбранную тему, если она не "All"
-                var currentSelectedTopic = SelectedTopic;
-                var isAllTopicsSelected = (currentSelectedTopic == "Все темы" || 
-                                         currentSelectedTopic == "All" || 
-                                         currentSelectedTopic == "全部");
-                
-                // Получаем все темы кроме локализованных версий "All"
-                var topics = Topics.Where(t => t != "Все темы" && t != "All" && t != "全部").ToList();
-                
-                // Обновляем список тем
-                Topics.Clear();
-                Topics.Add(allTopicsString);
-                foreach (var topic in topics)
-                {
-                    Topics.Add(topic);
-                }
-                
-                // Восстанавливаем выбранную тему
-                if (isAllTopicsSelected)
-                {
-                    SelectedTopic = allTopicsString;
-                }
-                else if (Topics.Contains(currentSelectedTopic))
-                {
-                    SelectedTopic = currentSelectedTopic;
-                }
-                else
-                {
-                    SelectedTopic = allTopicsString;
-                }
-            });
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _localizationService.LanguageChanged -= OnLanguageChanged;
-            }
-            base.Dispose(disposing);
+            System.Diagnostics.Debug.WriteLine($"Error in LoadDataAsync: {ex.Message}");
         }
     }
-} 
+
+    private void FilterCards()
+    {
+        UpdateGroupedCards();
+    }
+
+    private void UpdateGroupedCards()
+    {
+        var filteredCards = AllCards.Where(FilterCard).ToList();
+        
+        _newCards.Clear();
+        foreach (var card in filteredCards.Where(c => c.Status == CardStatus.New))
+        {
+            _newCards.Add(card);
+        }
+
+        _learningCards.Clear();
+        foreach (var card in filteredCards.Where(c => c.Status == CardStatus.Learning))
+        {
+            _learningCards.Add(card);
+        }
+
+        _knownCards.Clear();
+        foreach (var card in filteredCards.Where(c => c.Status == CardStatus.Known))
+        {
+            _knownCards.Add(card);
+        }
+    }
+
+    private bool FilterCard(FlashCard card)
+    {
+        var allTopicsString = _localizationService.GetString("All");
+        bool topicMatch = SelectedTopic == allTopicsString || card.Topic == SelectedTopic;
+        bool statusMatch = SelectedStatus == null || card.Status == SelectedStatus;
+        
+        return topicMatch && statusMatch;
+    }
+
+    private async Task AddCardAsync()
+    {
+        try
+        {
+            var viewModel = new AddCardDialogViewModel(_cardService);
+            var dialog = new Views.AddCardDialog(viewModel);
+            
+            dialog.Show();
+            
+            dialog.Closed += async (s, e) =>
+            {
+                if (viewModel.DialogResult == true)
+                {
+                    await LoadDataAsync();
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error opening add card dialog: {ex.Message}");
+        }
+    }
+
+    private async Task EditCardAsync(FlashCard? card)
+    {
+        if (card == null) return;
+
+        try
+        {
+            var viewModel = new AddCardDialogViewModel(_cardService, card);
+            var dialog = new Views.AddCardDialog(viewModel);
+            
+            dialog.Show();
+            
+            dialog.Closed += async (s, e) =>
+            {
+                if (viewModel.DialogResult == true)
+                {
+                    await LoadDataAsync();
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error opening edit card dialog: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteCardAsync(FlashCard? card)
+    {
+        if (card == null) return;
+
+        try
+        {
+            await _cardService.DeleteCardAsync(card.Id);
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error deleting card: {ex.Message}");
+        }
+    }
+
+    private void StartStudy()
+    {
+        try
+        {
+            string? studyTopic = null;
+            var allTopicsString = _localizationService.GetString("All");
+            if (SelectedTopic != allTopicsString)
+            {
+                studyTopic = SelectedTopic;
+            }
+
+            var viewModel = new StudyModeViewModel(_cardService, studyTopic);
+            var studyWindow = new Views.StudyModeWindow(viewModel);
+            
+            studyWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error opening study mode: {ex.Message}");
+        }
+    }
+
+    private async Task ShowLanguageSelectionAsync()
+    {
+        try
+        {
+            var languageWindow = new Views.LanguageSelectionWindow();
+            languageWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error opening language selection: {ex.Message}");
+        }
+    }
+
+    private void OnLanguageChanged()
+    {
+        var newLanguage = _localizationService.AvailableLanguages.FirstOrDefault(l => l.Code == _localizationService.CurrentCulture.Name) 
+                         ?? _localizationService.AvailableLanguages.First();
+        SetProperty(ref _currentLanguage, newLanguage, nameof(CurrentLanguage));
+        OnPropertyChanged(nameof(NewLabel));
+        OnPropertyChanged(nameof(LearningLabel));
+        OnPropertyChanged(nameof(KnownLabel));
+        OnPropertyChanged(nameof(AddCardLabel));
+        OnPropertyChanged(nameof(StudyModeLabel));
+        OnPropertyChanged(nameof(EditLabel));
+        OnPropertyChanged(nameof(DeleteLabel));
+        
+        var allTopicsString = _localizationService.GetString("All");
+        
+        var currentSelectedTopic = SelectedTopic;
+        var isAllTopicsSelected = (currentSelectedTopic == "Все темы" || 
+                                 currentSelectedTopic == "All" || 
+                                 currentSelectedTopic == "全部");
+        
+        var topics = Topics.Where(t => t != "Все темы" && t != "All" && t != "全部").ToList();
+        
+        Topics.Clear();
+        Topics.Add(allTopicsString);
+        foreach (var topic in topics)
+        {
+            Topics.Add(topic);
+        }
+        
+        if (isAllTopicsSelected)
+        {
+            SelectedTopic = allTopicsString;
+        }
+        else if (Topics.Contains(currentSelectedTopic))
+        {
+            SelectedTopic = currentSelectedTopic;
+        }
+        else
+        {
+            SelectedTopic = allTopicsString;
+        }
+    }
+
+    private async void OnCardsChanged()
+    {
+        try
+        {
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error refreshing cards: {ex.Message}");
+        }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _localizationService.LanguageChanged -= OnLanguageChanged;
+            _cardService.CardsChanged -= OnCardsChanged;
+        }
+        base.Dispose(disposing);
+    }
+}

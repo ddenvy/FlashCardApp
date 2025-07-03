@@ -1,0 +1,128 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuickMind.ViewModels"
+        x:Class="QuickMind.Views.LanguageSelectionWindow"
+        x:DataType="vm:LanguageSelectionViewModel"
+        Title="{Binding SelectLanguageTitle}" 
+        Height="500" Width="600"
+        WindowStartupLocation="CenterScreen" 
+        CanResize="False"
+        Icon="/Assets/avalonia-logo.ico"
+        Background="#1E1E1E">
+
+    <Window.Styles>
+        <Style Selector="Button.language-button">
+            <Setter Property="Margin" Value="0,8"/>
+            <Setter Property="Background" Value="#2A2A2A"/>
+            <Setter Property="BorderBrush" Value="#333333"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontFamily" Value="Corus"/>
+            <Setter Property="MinHeight" Value="50"/>
+            <Setter Property="MinWidth" Value="200"/>
+        </Style>
+        
+        <Style Selector="Button.language-button:pointerover">
+            <Setter Property="Background" Value="#3A3A3A"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+        </Style>
+        
+        <Style Selector="Button.language-button:pressed">
+            <Setter Property="Background" Value="#4A4A4A"/>
+        </Style>
+        
+        <Style Selector="Button.selected">
+            <Setter Property="Background" Value="#404040"/>
+            <Setter Property="BorderBrush" Value="#505050"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Заголовок -->
+        <Border Grid.Row="0" Background="#404040" Padding="32">
+            <StackPanel HorizontalAlignment="Center">
+                <Image Source="/Assets/QuickMindLogo.png" 
+                       Width="80" Height="80" 
+                       HorizontalAlignment="Center" 
+                       Margin="0,0,0,16"/>
+                <TextBlock Text="{Binding WelcomeMessage}" 
+                           FontSize="24" Foreground="#FFFFFF" 
+                           HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                <TextBlock Text="{Binding LanguageDescription}" 
+                           FontSize="14" Foreground="#FFFFFF" 
+                           HorizontalAlignment="Center" Opacity="0.9"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Список языков -->
+        <StackPanel Grid.Row="1" Margin="32,24" HorizontalAlignment="Center" Background="#1E1E1E">
+            <Button Name="EnglishButton" Classes="language-button" Click="OnEnglishClick">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" Text="🇺🇸" 
+                               FontSize="24" VerticalAlignment="Center" 
+                               Margin="0,0,16,0" FontFamily="Corus"/>
+                    
+                    <TextBlock Grid.Column="1" Text="English" 
+                               FontSize="16" 
+                               VerticalAlignment="Center" Foreground="#FFFFFF" FontFamily="Corus"/>
+                </Grid>
+            </Button>
+            
+            <Button Name="RussianButton" Classes="language-button" Click="OnRussianClick">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" Text="🇷🇺" 
+                               FontSize="24" VerticalAlignment="Center" 
+                               Margin="0,0,16,0" FontFamily="Corus"/>
+                    
+                    <TextBlock Grid.Column="1" Text="Русский" 
+                               FontSize="16" 
+                               VerticalAlignment="Center" Foreground="#FFFFFF" FontFamily="Corus"/>
+                </Grid>
+            </Button>
+            
+            <Button Name="ChineseButton" Classes="language-button" Click="OnChineseClick">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" Text="🇨🇳" 
+                               FontSize="24" VerticalAlignment="Center" 
+                               Margin="0,0,16,0" FontFamily="Corus"/>
+                    
+                    <TextBlock Grid.Column="1" Text="中文" 
+                               FontSize="16" 
+                               VerticalAlignment="Center" Foreground="#FFFFFF" FontFamily="Corus"/>
+                </Grid>
+            </Button>
+        </StackPanel>
+        
+        <!-- Кнопка продолжения -->
+        <Border Grid.Row="2" Background="#2A2A2A" BorderBrush="#333333" 
+                BorderThickness="0,1,0,0" Padding="32,16">
+            <TextBlock Text="Click on a language above to continue" 
+                       FontSize="12" Foreground="#B0B0B0" 
+                       HorizontalAlignment="Center"/>
+        </Border>
+    </Grid>
+</Window> 

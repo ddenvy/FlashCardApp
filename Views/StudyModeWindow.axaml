@@ -1,0 +1,194 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuickMind.ViewModels"
+        x:Class="QuickMind.Views.StudyModeWindow"
+        x:DataType="vm:StudyModeViewModel"
+        Title="Study Mode" Height="600" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Верхняя панель -->
+        <Border Grid.Row="0" Background="#2A2A2A" Padding="16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0" Text="{Binding StudyModeLabel}" 
+                           FontSize="18" Foreground="#FFFFFF" 
+                           VerticalAlignment="Center" FontFamily="Corus"/>
+                
+                <TextBlock Grid.Column="1" Text="{Binding StudyTopic, StringFormat='Topic: {0}'}" 
+                           FontSize="14" Foreground="#B0B0B0" 
+                           HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Corus"/>
+                
+                <TextBlock Grid.Column="2" Text="{Binding Progress}" 
+                           FontSize="14" Foreground="#FFFFFF" 
+                           VerticalAlignment="Center" FontFamily="Corus"/>
+            </Grid>
+        </Border>
+        
+        <!-- Основная область карточки -->
+        <Grid Grid.Row="1" Margin="32" Background="#1E1E1E">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Индикатор прогресса -->
+            <ProgressBar Grid.Row="0" Height="8" Margin="0,0,0,24"
+                         Maximum="{Binding TotalCards}" 
+                         Value="{Binding CurrentIndex}"/>
+            
+            <!-- Карточка -->
+            <Border Grid.Row="1" Background="#2A2A2A" 
+                    BorderBrush="#333333" BorderThickness="2" 
+                    CornerRadius="16" Padding="32"
+                    IsVisible="{Binding HasCards}">
+                
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Заголовок темы -->
+                    <Border Grid.Row="0" Background="#404040" 
+                            CornerRadius="8" Padding="12,6" 
+                            HorizontalAlignment="Center" Margin="0,0,0,24">
+                        <TextBlock Text="{Binding CurrentCard.Topic}" 
+                                   Foreground="#FFFFFF" FontSize="14" FontFamily="Corus"/>
+                    </Border>
+                    
+                    <!-- Содержимое карточки -->
+                    <Grid Grid.Row="1">
+                        <!-- Вопрос -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                                      IsVisible="{Binding !ShowAnswer}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding QuestionLabel}" FontSize="16" 
+                                           Foreground="#B0B0B0" HorizontalAlignment="Center" 
+                                           Margin="0,0,0,16" FontFamily="Corus"/>
+                                <TextBlock Text="{Binding CurrentCard.Question}" 
+                                           FontSize="18" TextWrapping="Wrap" 
+                                           HorizontalAlignment="Center" TextAlignment="Center"
+                                           Foreground="#FFFFFF" FontFamily="Corus"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                        
+                        <!-- Ответ -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                                      IsVisible="{Binding ShowAnswer}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding AnswerLabel}" FontSize="16" 
+                                           Foreground="#A0A0A0" HorizontalAlignment="Center" 
+                                           Margin="0,0,0,16" FontFamily="Corus"/>
+                                <TextBlock Text="{Binding CurrentCard.Answer}" 
+                                           FontSize="18" TextWrapping="Wrap" 
+                                           HorizontalAlignment="Center" TextAlignment="Center"
+                                           Foreground="#FFFFFF" FontFamily="Corus"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                    
+                    <!-- Инструкция -->
+                    <TextBlock Grid.Row="2" 
+                               Text="{Binding ClickToShowAnswerLabel}" 
+                               FontSize="12" Foreground="#B0B0B0" 
+                               HorizontalAlignment="Center" Margin="0,24,0,0"
+                               IsVisible="{Binding !ShowAnswer}" FontFamily="Corus"/>
+                    <TextBlock Grid.Row="2" 
+                               Text="{Binding RateKnowledgeLabel}" 
+                               FontSize="12" Foreground="#B0B0B0" 
+                               HorizontalAlignment="Center" Margin="0,24,0,0"
+                               IsVisible="{Binding ShowAnswer}" FontFamily="Corus"/>
+                </Grid>
+            </Border>
+            
+            <!-- Сообщение об отсутствии карточек -->
+            <Border Grid.Row="1" Background="#2A2A2A" 
+                    BorderBrush="#333333" BorderThickness="2" 
+                    CornerRadius="16" Padding="32"
+                    IsVisible="{Binding !HasCards}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="📖" FontSize="48" HorizontalAlignment="Center" 
+                               Margin="0,0,0,16" FontFamily="Corus"/>
+                    <TextBlock Text="{Binding NoCardsLabel}" 
+                               FontSize="18" 
+                               HorizontalAlignment="Center" Margin="0,0,0,8"
+                               Foreground="#FFFFFF" FontFamily="Corus"/>
+                    <TextBlock Text="{Binding AddCardsLabel}" 
+                               FontSize="14" Foreground="#B0B0B0" 
+                               HorizontalAlignment="Center" FontFamily="Corus"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+        
+        <!-- Нижняя панель управления -->
+        <Border Grid.Row="2" Background="#2A2A2A" 
+                BorderBrush="#333333" BorderThickness="0,1,0,0" 
+                Padding="32,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Левые кнопки -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Content="{Binding PreviousLabel}" 
+                            Command="{Binding PreviousCardCommand}"
+                            Margin="0,0,8,0"/>
+                    
+                    <Button Content="{Binding RestartLabel}" 
+                            Command="{Binding RestartCommand}"
+                            Margin="0,0,8,0"
+                            Classes="primary"/>
+                </StackPanel>
+                
+                <!-- Центральные кнопки -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" 
+                            HorizontalAlignment="Center">
+                    
+                    <!-- Кнопка показа ответа -->
+                    <Button Content="{Binding ShowAnswerLabel}" 
+                            Command="{Binding ShowAnswerCommand}"
+                            Margin="0,0,16,0"
+                            IsVisible="{Binding !ShowAnswer}"
+                            Classes="primary"/>
+                    
+                    <!-- Кнопки оценки -->
+                    <StackPanel Orientation="Horizontal" 
+                                IsVisible="{Binding ShowAnswer}">
+                        <Button Content="{Binding DontKnowLabel}" 
+                                Command="{Binding DontKnowCommand}"
+                                Margin="0,0,8,0"
+                                Classes="danger"/>
+                        
+                        <Button Content="{Binding KnowLabel}" 
+                                Command="{Binding KnowCommand}"
+                                Classes="success"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                <!-- Правые кнопки -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="{Binding NextLabel}" 
+                            Command="{Binding NextCardCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+    </Grid>
+</Window>

@@ -1,0 +1,115 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="QuickMind.App"
+xmlns:local="using:QuickMind"
+             RequestedThemeVariant="Dark">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <FluentTheme />
+        
+        <!-- Глобальные стили для темной темы -->
+        <Style Selector="Window">
+            <Setter Property="Background" Value="#1E1E1E"/>
+            <Setter Property="FontFamily" Value="Corus"/>
+        </Style>
+        
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontFamily" Value="Corus"/>
+        </Style>
+        
+        <Style Selector="Border">
+            <Setter Property="BorderBrush" Value="#333333"/>
+        </Style>
+        
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#2A2A2A"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#404040"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="FontFamily" Value="Corus"/>
+            <Setter Property="MinHeight" Value="36"/>
+            <Setter Property="MinWidth" Value="80"/>
+        </Style>
+        
+        <Style Selector="Button:pointerover">
+            <Setter Property="Background" Value="#3A3A3A"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+        </Style>
+        
+        <Style Selector="Button:pressed">
+            <Setter Property="Background" Value="#4A4A4A"/>
+        </Style>
+        
+        <!-- Стиль для основных кнопок действий -->
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#404040"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+            <Setter Property="FontFamily" Value="Corus"/>
+        </Style>
+        
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="Background" Value="#505050"/>
+        </Style>
+        
+        <!-- Стиль для опасных действий -->
+        <Style Selector="Button.danger">
+            <Setter Property="Background" Value="#3A2A2A"/>
+            <Setter Property="Foreground" Value="#FF6B6B"/>
+            <Setter Property="BorderBrush" Value="#4A3A3A"/>
+            <Setter Property="FontFamily" Value="Corus"/>
+        </Style>
+        
+        <Style Selector="Button.danger:pointerover">
+            <Setter Property="Background" Value="#4A3A3A"/>
+        </Style>
+        
+        <!-- Стиль для кнопок успеха -->
+        <Style Selector="Button.success">
+            <Setter Property="Background" Value="#2A3A2A"/>
+            <Setter Property="Foreground" Value="#6BFF6B"/>
+            <Setter Property="BorderBrush" Value="#3A4A3A"/>
+            <Setter Property="FontFamily" Value="Corus"/>
+        </Style>
+        
+        <Style Selector="Button.success:pointerover">
+            <Setter Property="Background" Value="#3A4A3A"/>
+        </Style>
+        
+        <Style Selector="ListBox">
+            <Setter Property="Background" Value="#252526"/>
+            <Setter Property="FontFamily" Value="Corus"/>
+        </Style>
+        
+        <Style Selector="ComboBox">
+            <Setter Property="Background" Value="#2A2A2A"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#404040"/>
+            <Setter Property="FontFamily" Value="Corus"/>
+            <Setter Property="MinHeight" Value="36"/>
+            <Setter Property="Padding" Value="8"/>
+        </Style>
+        
+        <Style Selector="TextBox">
+            <Setter Property="Background" Value="#2A2A2A"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#404040"/>
+            <Setter Property="FontFamily" Value="Corus"/>
+            <Setter Property="MinHeight" Value="36"/>
+            <Setter Property="Padding" Value="8"/>
+        </Style>
+        
+        <Style Selector="ProgressBar">
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="#666666"/>
+        </Style>
+    </Application.Styles>
+</Application>

@@ -1,0 +1,97 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuickMind.ViewModels"
+        x:Class="QuickMind.Views.AddCardDialog"
+        x:DataType="vm:AddCardDialogViewModel"
+        Title="{Binding DialogTitle}" Height="500" Width="600"
+        WindowStartupLocation="CenterOwner" CanResize="False"
+        Background="#1E1E1E">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Заголовок -->
+        <Border Grid.Row="0" Background="#404040" Padding="16">
+            <TextBlock Text="{Binding DialogTitle}" 
+                       FontSize="18" Foreground="#FFFFFF" HorizontalAlignment="Center" FontFamily="Corus"/>
+        </Border>
+        
+        <!-- Основное содержимое -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#1E1E1E">
+            <StackPanel Margin="24">
+                
+                <!-- Поле вопроса -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock Text="{Binding QuestionLabel} *" Margin="0,0,0,4" Foreground="#FFFFFF" FontFamily="Corus"/>
+                    <TextBox Text="{Binding Question}" 
+                             TextWrapping="Wrap" MinHeight="80" AcceptsReturn="True"
+                             Width="500" HorizontalAlignment="Stretch"/>
+                </StackPanel>
+                
+                <!-- Поле ответа -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock Text="{Binding AnswerLabel} *" Margin="0,0,0,4" Foreground="#FFFFFF" FontFamily="Corus"/>
+                    <TextBox Text="{Binding Answer}" 
+                             TextWrapping="Wrap" MinHeight="100" AcceptsReturn="True"
+                             Width="500" HorizontalAlignment="Stretch"/>
+                </StackPanel>
+                
+                <!-- Поле темы -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock Text="{Binding TopicLabel} *" Margin="0,0,0,4" Foreground="#FFFFFF" FontFamily="Corus"/>
+                    <TextBox Text="{Binding SelectedTopic}" 
+                             Width="500" HorizontalAlignment="Stretch"/>
+                </StackPanel>
+                
+                <!-- Предварительный просмотр -->
+                <Border Background="#2A2A2A" BorderBrush="#333333" BorderThickness="1" 
+                        CornerRadius="8" Padding="16" Margin="0,16,0,0">
+                    <StackPanel>
+                        <TextBlock Text="{Binding PreviewLabel}" 
+                                   Margin="0,0,0,8" Foreground="#FFFFFF" FontFamily="Corus"/>
+                        
+                        <Border Background="#333333" CornerRadius="4" Padding="12" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="{Binding QuestionLabel}:" FontSize="12" 
+                                           Foreground="#B0B0B0" FontFamily="Corus"/>
+                                <TextBlock Text="{Binding Question}" TextWrapping="Wrap" 
+                                           Margin="0,4,0,0" Foreground="#FFFFFF" FontFamily="Corus"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Background="#1A1A1A" CornerRadius="4" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="{Binding AnswerLabel}:" FontSize="12" 
+                                           Foreground="#B0B0B0" FontFamily="Corus"/>
+                                <TextBlock Text="{Binding Answer}" TextWrapping="Wrap" 
+                                           Margin="0,4,0,0" Foreground="#FFFFFF" FontFamily="Corus"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <TextBlock Text="{Binding SelectedTopic, StringFormat='Topic: {0}'}" 
+                                   FontSize="12" Foreground="#B0B0B0" HorizontalAlignment="Right" 
+                                   Margin="0,8,0,0" FontFamily="Corus"/>
+                    </StackPanel>
+                </Border>
+                
+            </StackPanel>
+        </ScrollViewer>
+        
+        <!-- Кнопки -->
+        <Border Grid.Row="2" Background="#2A2A2A" BorderBrush="#333333" 
+                BorderThickness="0,1,0,0" Padding="24,16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="{Binding CancelLabel}" Command="{Binding CancelCommand}"
+                        Margin="0,0,8,0"/>
+                
+                <Button Content="{Binding SaveLabel}" 
+                        Command="{Binding SaveCommand}"
+                        Classes="primary"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window> 

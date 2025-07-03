@@ -1,19 +1,20 @@
-using FlashCardApp.Models;
+using QuickMind.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FlashCardApp.Services
+namespace QuickMind.Services
 {
     public class CardService
     {
+        public event Action? CardsChanged;
+
         public async Task InitializeDatabaseAsync()
         {
             using var context = new FlashCardContext();
             await context.Database.EnsureCreatedAsync();
-            
-            // База данных создается пустой - пользователь может добавить свои карточки
         }
 
         public async Task<List<FlashCard>> GetAllCardsAsync()
@@ -55,6 +56,9 @@ namespace FlashCardApp.Services
             using var context = new FlashCardContext();
             context.FlashCards.Add(card);
             await context.SaveChangesAsync();
+            
+            CardsChanged?.Invoke();
+            
             return card;
         }
 
@@ -63,6 +67,9 @@ namespace FlashCardApp.Services
             using var context = new FlashCardContext();
             context.FlashCards.Update(card);
             await context.SaveChangesAsync();
+            
+            CardsChanged?.Invoke();
+            
             return card;
         }
 
@@ -74,6 +81,8 @@ namespace FlashCardApp.Services
             {
                 context.FlashCards.Remove(card);
                 await context.SaveChangesAsync();
+                
+                CardsChanged?.Invoke();
             }
         }
 
@@ -87,6 +96,8 @@ namespace FlashCardApp.Services
                 card.LastViewedAt = DateTime.Now;
                 card.ViewCount++;
                 await context.SaveChangesAsync();
+                
+                CardsChanged?.Invoke();
             }
         }
     }

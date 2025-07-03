@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace FlashCardApp.Models
+namespace QuickMind.Models
 {
     public class FlashCard
     {
