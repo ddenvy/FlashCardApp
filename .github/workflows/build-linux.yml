@@ -495,8 +495,24 @@ jobs:
         
         mkdir -p flatpak-build
         
+        # Create desktop file separately
+        cat > flatpak-build/quickmind.desktop << 'DESKTOP_EOF'
+        [Desktop Entry]
+        Name=QuickMind
+        Comment=Flash Cards Learning Application
+        Exec=QuickMind
+        Icon=com.quickmind.QuickMind
+        Terminal=false
+        Type=Application
+        Categories=Education;
+        StartupWMClass=QuickMind
+        DESKTOP_EOF
+        
+        # Copy icon to build directory
+        cp Assets/QuickMindLogo.png flatpak-build/quickmind.png
+        
         # Create manifest
-        cat > flatpak-build/com.quickmind.QuickMind.yml << EOF
+        cat > flatpak-build/com.quickmind.QuickMind.yml << 'MANIFEST_EOF'
         app-id: com.quickmind.QuickMind
         runtime: org.freedesktop.Platform
         runtime-version: '23.08'
@@ -515,30 +531,20 @@ jobs:
           - name: quickmind
             buildsystem: simple
             build-commands:
+              - ls -la
               - install -Dm755 QuickMind /app/bin/QuickMind
-              - install -Dm755 *.dll /app/bin/
-              - install -Dm755 *.so* /app/bin/ || true
+              - find . -name "*.dll" -exec install -Dm755 {} /app/bin/ \;
+              - find . -name "*.so*" -exec install -Dm755 {} /app/bin/ \; || true
               - install -Dm644 quickmind.desktop /app/share/applications/com.quickmind.QuickMind.desktop
               - install -Dm644 quickmind.png /app/share/icons/hicolor/256x256/apps/com.quickmind.QuickMind.png
             sources:
               - type: dir
                 path: ../binaries
               - type: file
-                path: ../Assets/QuickMindLogo.png
-                dest-filename: quickmind.png
+                path: quickmind.desktop
               - type: file
-                dest-filename: quickmind.desktop
-                contents: |
-                  [Desktop Entry]
-                  Name=QuickMind
-                  Comment=Flash Cards Learning Application
-                  Exec=QuickMind
-                  Icon=com.quickmind.QuickMind
-                  Terminal=false
-                  Type=Application
-                  Categories=Education;
-                  StartupWMClass=QuickMind
-        EOF
+                path: quickmind.png
+        MANIFEST_EOF
         
         echo "Flatpak manifest created"
         cat flatpak-build/com.quickmind.QuickMind.yml
@@ -548,6 +554,12 @@ jobs:
         VERSION="${{ steps.get_version.outputs.VERSION }}"
         
         cd flatpak-build
+        
+        # Show structure for debugging
+        echo "=== Build directory structure ==="
+        ls -la
+        echo "=== Binaries directory ==="
+        ls -la ../binaries/ || echo "No binaries directory"
         
         # Build the flatpak
         flatpak-builder --force-clean --repo=repo build-dir com.quickmind.QuickMind.yml
@@ -670,113 +682,65 @@ jobs:
         
         mkdir -p gentoo-package/app-misc/quickmind
         
-        cat > gentoo-package/app-misc/quickmind/quickmind-${VERSION}.ebuild << EOF
-        # Copyright 2024 Gentoo Authors
-        # Distributed under the terms of the GNU General Public License v2
+        # Create ebuild file using echo commands
+        EBUILD_FILE="gentoo-package/app-misc/quickmind/quickmind-${VERSION}.ebuild"
         
-        EAPI=8
-        
-        inherit dotnet-pkg
-        
-        DESCRIPTION="Flash Cards Learning Application built with .NET and Avalonia UI"
-        HOMEPAGE="https://github.com/ddenvy/QuickMind"
-        SRC_URI="https://github.com/ddenvy/QuickMind/archive/v\${PV}.tar.gz -> \${P}.tar.gz"
-        
-        LICENSE="MIT"
-        SLOT="0"
-        KEYWORDS="~amd64 ~arm64"
-        
-        DEPEND="
-            >=dev-dotnet/dotnet-sdk-bin-9.0
-        "
-        RDEPEND="
-            >=dev-dotnet/dotnet-runtime-9.0
-            x11-libs/gtk+:3
-            x11-libs/libX11
-            x11-libs/libXrandr
-            x11-libs/libXi
-        "
-        
-        S="\${WORKDIR}/QuickMind-\${PV}"
-        
-        src_prepare() {
-            default
-            dotnet-pkg_src_prepare
-        }
-        
-        src_configure() {
-            dotnet-pkg_src_configure
-        }
-        
-        src_compile() {
-            local arch
-            case "\${ABI}" in
-                amd64) arch="linux-x64" ;;
-                arm64) arch="linux-arm64" ;;
-                *) die "Unsupported architecture: \${ABI}" ;;
-            esac
-            
-            dotnet publish -c Release -r "\${arch}" --self-contained false \\
-                -o "\${S}/publish" || die "Compilation failed"
-        }
-        
-        src_install() {
-            # Install application files
-            dodir /usr/share/quickmind
-            cp -r publish/* "\${D}/usr/share/quickmind/" || die
-            fperms +x /usr/share/quickmind/QuickMind
-            
-            # Create launcher script
-            dodir /usr/bin
-            cat > "\${D}/usr/bin/quickmind" << 'EOF'
-        #!/bin/bash
-        exec /usr/share/quickmind/QuickMind "\$@"
-        EOF
-            fperms +x /usr/bin/quickmind
-            
-            # Install desktop file
-            dodir /usr/share/applications
-            cat > "\${D}/usr/share/applications/quickmind.desktop" << 'EOF'
-        [Desktop Entry]
-        Name=QuickMind
-        Comment=Flash Cards Learning Application
-        Exec=quickmind
-        Icon=quickmind
-        Terminal=false
-        Type=Application
-        Categories=Education;
-        StartupWMClass=QuickMind
-        EOF
-            
-            # Install icon
-            dodir /usr/share/pixmaps
-            cp Assets/QuickMindLogo.png "\${D}/usr/share/pixmaps/quickmind.png" || die
-            
-            # Install documentation
-            dodoc README.md || die
-        }
-        EOF
+        echo "# Copyright 2024 Gentoo Authors" > "$EBUILD_FILE"
+        echo "# Distributed under the terms of the GNU General Public License v2" >> "$EBUILD_FILE"
+        echo "" >> "$EBUILD_FILE"
+        echo "EAPI=8" >> "$EBUILD_FILE"
+        echo "" >> "$EBUILD_FILE"
+        echo "inherit dotnet-pkg" >> "$EBUILD_FILE"
+        echo "" >> "$EBUILD_FILE"
+        echo 'DESCRIPTION="Flash Cards Learning Application built with .NET and Avalonia UI"' >> "$EBUILD_FILE"
+        echo 'HOMEPAGE="https://github.com/ddenvy/QuickMind"' >> "$EBUILD_FILE"
+        echo 'SRC_URI="https://github.com/ddenvy/QuickMind/archive/v${PV}.tar.gz -> ${P}.tar.gz"' >> "$EBUILD_FILE"
+        echo "" >> "$EBUILD_FILE"
+        echo 'LICENSE="MIT"' >> "$EBUILD_FILE"
+        echo 'SLOT="0"' >> "$EBUILD_FILE"
+        echo 'KEYWORDS="~amd64 ~arm64"' >> "$EBUILD_FILE"
+        echo "" >> "$EBUILD_FILE"
+        echo 'DEPEND=">=dev-dotnet/dotnet-sdk-bin-9.0"' >> "$EBUILD_FILE"
+        echo 'RDEPEND=">=dev-dotnet/dotnet-runtime-9.0 x11-libs/gtk+:3"' >> "$EBUILD_FILE"
+        echo "" >> "$EBUILD_FILE"
+        echo 'S="${WORKDIR}/QuickMind-${PV}"' >> "$EBUILD_FILE"
+        echo "" >> "$EBUILD_FILE"
+        echo "src_prepare() {" >> "$EBUILD_FILE"
+        echo "    default" >> "$EBUILD_FILE"
+        echo "    dotnet-pkg_src_prepare" >> "$EBUILD_FILE"
+        echo "}" >> "$EBUILD_FILE"
+        echo "" >> "$EBUILD_FILE"
+        echo "src_configure() {" >> "$EBUILD_FILE"
+        echo "    dotnet-pkg_src_configure" >> "$EBUILD_FILE"
+        echo "}" >> "$EBUILD_FILE"
+        echo "" >> "$EBUILD_FILE"
+        echo "src_compile() {" >> "$EBUILD_FILE"
+        echo "    dotnet publish -c Release -r linux-x64 --self-contained false -o publish" >> "$EBUILD_FILE"
+        echo "}" >> "$EBUILD_FILE"
+        echo "" >> "$EBUILD_FILE"
+        echo "src_install() {" >> "$EBUILD_FILE"
+        echo "    insinto /usr/share/quickmind" >> "$EBUILD_FILE"
+        echo "    doins -r publish/*" >> "$EBUILD_FILE"
+        echo "    fperms +x /usr/share/quickmind/QuickMind" >> "$EBUILD_FILE"
+        echo "    dobin QuickMind" >> "$EBUILD_FILE"
+        echo "}" >> "$EBUILD_FILE"
         
         # Create metadata.xml
-        cat > gentoo-package/app-misc/quickmind/metadata.xml << EOF
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
-        <pkgmetadata>
-            <maintainer type="person">
-                <email>contact@quickmind.app</email>
-                <name>QuickMind Team</name>
-            </maintainer>
-            <longdescription>
-                QuickMind is a cross-platform flash cards application built with .NET and Avalonia UI.
-                It provides an intuitive interface for creating and studying flash cards with
-                support for multiple languages including English, Russian, and Chinese.
-            </longdescription>
-            <upstream>
-                <remote-id type="github">ddenvy/QuickMind</remote-id>
-            </upstream>
-        </pkgmetadata>
-        EOF
-        
+        echo '<?xml version="1.0" encoding="UTF-8"?>' > gentoo-package/app-misc/quickmind/metadata.xml
+        echo '<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '<pkgmetadata>' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '  <maintainer type="person">' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '    <email>contact@quickmind.app</email>' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '    <name>QuickMind Team</name>' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '  </maintainer>' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '  <longdescription>' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '    QuickMind is a cross-platform flash cards application built with .NET and Avalonia UI.' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '  </longdescription>' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '  <upstream>' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '    <remote-id type="github">ddenvy/QuickMind</remote-id>' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '  </upstream>' >> gentoo-package/app-misc/quickmind/metadata.xml
+        echo '</pkgmetadata>' >> gentoo-package/app-misc/quickmind/metadata.xml
+
         echo "Gentoo ebuild created"
     
     - name: Create source tarball
