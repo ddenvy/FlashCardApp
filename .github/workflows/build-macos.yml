@@ -164,13 +164,13 @@ jobs:
         ls -lh "./dist/$DMG_NAME"
     
     - name: Upload DMG artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: QuickMind-${{ matrix.arch }}-v${{ steps.get_version.outputs.VERSION }}
         path: ./dist/QuickMind-${{ matrix.arch }}-v${{ steps.get_version.outputs.VERSION }}.dmg
     
     - name: Upload App Bundle artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: QuickMind-${{ matrix.arch }}-app
         path: ./dist/QuickMind-${{ matrix.arch }}.app/
@@ -196,7 +196,7 @@ jobs:
         fi
     
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
     
     - name: Create Release
       uses: softprops/action-gh-release@v1

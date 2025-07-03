@@ -44,7 +44,7 @@ jobs:
         ./installer/Build-Windows-Installer.ps1 -Version "${{ steps.get_version.outputs.VERSION }}"
     
     - name: Upload Windows installer
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: QuickMind-Windows-v${{ steps.get_version.outputs.VERSION }}
         path: ./dist/QuickMind-Setup-v${{ steps.get_version.outputs.VERSION }}.exe
@@ -196,7 +196,7 @@ jobs:
         ls -lh "./dist/$DMG_NAME"
     
     - name: Upload DMG artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: QuickMind-${{ matrix.arch }}-v${{ steps.get_version.outputs.VERSION }}
         path: ./dist/QuickMind-${{ matrix.arch }}-v${{ steps.get_version.outputs.VERSION }}.dmg
@@ -222,7 +222,7 @@ jobs:
         fi
     
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
     
     - name: Display structure
       run: find . -type f -name "*.exe" -o -name "*.dmg" | head -20
