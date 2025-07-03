@@ -1,0 +1,900 @@
+name: Build Linux Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build'
+        required: true
+        default: '2.1.2'
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to build'
+        required: false
+        type: string
+        default: '2.1.2'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-linux-binaries:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [linux-x64, linux-arm64]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "workflow_call" ]; then
+          echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=2.1.2-dev" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build and publish
+      run: |
+        mkdir -p "./dist"
+        dotnet publish -c Release -r ${{ matrix.arch }} --self-contained true -p:PublishSingleFile=false -o "./dist/quickmind-${{ matrix.arch }}"
+    
+    - name: Upload Linux binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: quickmind-${{ matrix.arch }}
+        path: ./dist/quickmind-${{ matrix.arch }}/
+
+  build-deb-package:
+    needs: build-linux-binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [linux-x64, linux-arm64]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "workflow_call" ]; then
+          echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=2.1.2-dev" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Download Linux binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: quickmind-${{ matrix.arch }}
+        path: ./binaries/
+    
+    - name: Create DEB package
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        ARCH_MAP_x64="amd64"
+        ARCH_MAP_arm64="arm64"
+        DEB_ARCH=$(eval echo \$ARCH_MAP_${{ matrix.arch == 'linux-x64' && 'x64' || 'arm64' }})
+        
+        # Create package structure
+        mkdir -p "./deb-package/quickmind-${VERSION}/DEBIAN"
+        mkdir -p "./deb-package/quickmind-${VERSION}/usr/bin"
+        mkdir -p "./deb-package/quickmind-${VERSION}/usr/share/applications"
+        mkdir -p "./deb-package/quickmind-${VERSION}/usr/share/pixmaps"
+        mkdir -p "./deb-package/quickmind-${VERSION}/usr/share/doc/quickmind"
+        
+        # Copy binaries
+        cp -r ./binaries/* "./deb-package/quickmind-${VERSION}/usr/bin/"
+        chmod +x "./deb-package/quickmind-${VERSION}/usr/bin/QuickMind"
+        
+        # Create desktop file
+        cat > "./deb-package/quickmind-${VERSION}/usr/share/applications/quickmind.desktop" << EOF
+        [Desktop Entry]
+        Name=QuickMind
+        Comment=Flash Cards Learning Application
+        Exec=/usr/bin/QuickMind
+        Icon=quickmind
+        Terminal=false
+        Type=Application
+        Categories=Education;
+        StartupWMClass=QuickMind
+        EOF
+        
+        # Copy icon
+        if [ -f "Assets/QuickMindLogo.png" ]; then
+          cp "Assets/QuickMindLogo.png" "./deb-package/quickmind-${VERSION}/usr/share/pixmaps/quickmind.png"
+        fi
+        
+        # Create control file
+        cat > "./deb-package/quickmind-${VERSION}/DEBIAN/control" << EOF
+        Package: quickmind
+        Version: ${VERSION}
+        Section: education
+        Priority: optional
+        Architecture: ${DEB_ARCH}
+        Depends: libc6, libgcc-s1, libssl3
+        Maintainer: QuickMind Team <contact@quickmind.app>
+        Description: Flash Cards Learning Application
+         QuickMind is a cross-platform flash cards application built with .NET and Avalonia UI.
+         It provides an intuitive interface for creating and studying flash cards with
+         support for multiple languages including English, Russian, and Chinese.
+         .
+         Features:
+          - Dark theme interface
+          - Multi-language support
+          - SQLite database storage
+          - Cross-platform compatibility
+        Homepage: https://github.com/ddenvy/QuickMind
+        EOF
+        
+        # Create changelog
+        cat > "./deb-package/quickmind-${VERSION}/usr/share/doc/quickmind/changelog.Debian" << EOF
+        quickmind (${VERSION}) unstable; urgency=low
+        
+          * New upstream release
+          * Updated dependencies
+          * Bug fixes and improvements
+        
+         -- QuickMind Team <contact@quickmind.app>  $(date -R)
+        EOF
+        gzip -9 "./deb-package/quickmind-${VERSION}/usr/share/doc/quickmind/changelog.Debian"
+        
+        # Create copyright file
+        cat > "./deb-package/quickmind-${VERSION}/usr/share/doc/quickmind/copyright" << EOF
+        Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+        Upstream-Name: QuickMind
+        Source: https://github.com/ddenvy/QuickMind
+        
+        Files: *
+        Copyright: 2024 QuickMind Team
+        License: MIT
+        
+        License: MIT
+         Permission is hereby granted, free of charge, to any person obtaining a
+         copy of this software and associated documentation files (the "Software"),
+         to deal in the Software without restriction, including without limitation
+         the rights to use, copy, modify, merge, publish, distribute, sublicense,
+         and/or sell copies of the Software, and to permit persons to whom the
+         Software is furnished to do so, subject to the following conditions:
+         .
+         The above copyright notice and this permission notice shall be included
+         in all copies or substantial portions of the Software.
+         .
+         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+         OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+         FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+         THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+         FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+         DEALINGS IN THE SOFTWARE.
+        EOF
+        
+        # Build DEB package
+        mkdir -p "./dist"
+        dpkg-deb --build "./deb-package/quickmind-${VERSION}" "./dist/quickmind_${VERSION}_${DEB_ARCH}.deb"
+        
+        echo "DEB package created: ./dist/quickmind_${VERSION}_${DEB_ARCH}.deb"
+        ls -lh "./dist/quickmind_${VERSION}_${DEB_ARCH}.deb"
+    
+    - name: Upload DEB package
+      uses: actions/upload-artifact@v4
+      with:
+        name: quickmind-deb-${{ matrix.arch }}
+        path: ./dist/*.deb
+
+  build-rpm-package:
+    needs: build-linux-binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [linux-x64, linux-arm64]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install RPM tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y rpm rpmbuild
+    
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "workflow_call" ]; then
+          echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=2.1.2-dev" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Download Linux binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: quickmind-${{ matrix.arch }}
+        path: ./binaries/
+    
+    - name: Create RPM package
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        RPM_ARCH=${{ matrix.arch == 'linux-x64' && 'x86_64' || 'aarch64' }}
+        
+        # Setup RPM build environment
+        mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+        
+        # Create source tarball
+        mkdir -p "quickmind-${VERSION}"
+        cp -r ./binaries/* "quickmind-${VERSION}/"
+        if [ -f "Assets/QuickMindLogo.png" ]; then
+          cp "Assets/QuickMindLogo.png" "quickmind-${VERSION}/"
+        fi
+        tar czf ~/rpmbuild/SOURCES/quickmind-${VERSION}.tar.gz "quickmind-${VERSION}"
+        
+        # Create spec file
+        cat > ~/rpmbuild/SPECS/quickmind.spec << EOF
+        Name: quickmind
+        Version: ${VERSION}
+        Release: 1%{?dist}
+        Summary: Flash Cards Learning Application
+        License: MIT
+        URL: https://github.com/ddenvy/QuickMind
+        Source0: %{name}-%{version}.tar.gz
+        BuildArch: ${RPM_ARCH}
+        
+        Requires: glibc libgcc openssl-libs
+        
+        %description
+        QuickMind is a cross-platform flash cards application built with .NET and Avalonia UI.
+        It provides an intuitive interface for creating and studying flash cards with
+        support for multiple languages including English, Russian, and Chinese.
+        
+        %prep
+        %setup -q
+        
+        %install
+        mkdir -p %{buildroot}/usr/bin
+        mkdir -p %{buildroot}/usr/share/applications
+        mkdir -p %{buildroot}/usr/share/pixmaps
+        
+        cp -r * %{buildroot}/usr/bin/
+        chmod +x %{buildroot}/usr/bin/QuickMind
+        
+        # Create desktop file
+        cat > %{buildroot}/usr/share/applications/quickmind.desktop << EOFDESKTOP
+        [Desktop Entry]
+        Name=QuickMind
+        Comment=Flash Cards Learning Application
+        Exec=/usr/bin/QuickMind
+        Icon=quickmind
+        Terminal=false
+        Type=Application
+        Categories=Education;
+        StartupWMClass=QuickMind
+        EOFDESKTOP
+        
+        # Install icon if available
+        if [ -f QuickMindLogo.png ]; then
+          cp QuickMindLogo.png %{buildroot}/usr/share/pixmaps/quickmind.png
+        fi
+        
+        %files
+        /usr/bin/*
+        /usr/share/applications/quickmind.desktop
+        %if 0%{?rhel} >= 8 || 0%{?fedora}
+        /usr/share/pixmaps/quickmind.png
+        %endif
+        
+        %changelog
+        * $(date '+%a %b %d %Y') QuickMind Team <contact@quickmind.app> - ${VERSION}-1
+        - New upstream release
+        - Updated dependencies
+        - Bug fixes and improvements
+        EOF
+        
+        # Build RPM
+        rpmbuild -bb ~/rpmbuild/SPECS/quickmind.spec
+        
+        # Copy to dist
+        mkdir -p "./dist"
+        cp ~/rpmbuild/RPMS/${RPM_ARCH}/quickmind-${VERSION}-1.*.${RPM_ARCH}.rpm "./dist/"
+        
+        echo "RPM package created:"
+        ls -lh ./dist/*.rpm
+    
+    - name: Upload RPM package
+      uses: actions/upload-artifact@v4
+      with:
+        name: quickmind-rpm-${{ matrix.arch }}
+        path: ./dist/*.rpm
+
+  build-appimage:
+    needs: build-linux-binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [linux-x64, linux-arm64]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "workflow_call" ]; then
+          echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=2.1.2-dev" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Download Linux binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: quickmind-${{ matrix.arch }}
+        path: ./binaries/
+    
+    - name: Create AppImage
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        APPIMAGE_ARCH=${{ matrix.arch == 'linux-x64' && 'x86_64' || 'aarch64' }}
+        
+        # Download appimagetool
+        wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}.AppImage
+        chmod +x appimagetool-${APPIMAGE_ARCH}.AppImage
+        
+        # Create AppDir structure
+        mkdir -p QuickMind.AppDir/usr/bin
+        mkdir -p QuickMind.AppDir/usr/share/applications
+        mkdir -p QuickMind.AppDir/usr/share/pixmaps
+        
+        # Copy binaries
+        cp -r ./binaries/* QuickMind.AppDir/usr/bin/
+        chmod +x QuickMind.AppDir/usr/bin/QuickMind
+        
+        # Create desktop file
+        cat > QuickMind.AppDir/quickmind.desktop << EOF
+        [Desktop Entry]
+        Name=QuickMind
+        Comment=Flash Cards Learning Application
+        Exec=QuickMind
+        Icon=quickmind
+        Terminal=false
+        Type=Application
+        Categories=Education;
+        StartupWMClass=QuickMind
+        EOF
+        
+        # Copy desktop file to standard location
+        cp QuickMind.AppDir/quickmind.desktop QuickMind.AppDir/usr/share/applications/
+        
+        # Copy and prepare icon
+        if [ -f "Assets/QuickMindLogo.png" ]; then
+          cp "Assets/QuickMindLogo.png" QuickMind.AppDir/quickmind.png
+          cp "Assets/QuickMindLogo.png" QuickMind.AppDir/usr/share/pixmaps/quickmind.png
+        fi
+        
+        # Create AppRun script
+        cat > QuickMind.AppDir/AppRun << 'EOF'
+        #!/bin/bash
+        HERE="$(dirname "$(readlink -f "${0}")")"
+        export PATH="${HERE}/usr/bin:${PATH}"
+        export LD_LIBRARY_PATH="${HERE}/usr/lib:${LD_LIBRARY_PATH}"
+        exec "${HERE}/usr/bin/QuickMind" "$@"
+        EOF
+        chmod +x QuickMind.AppDir/AppRun
+        
+        # Build AppImage
+        mkdir -p "./dist"
+        ./appimagetool-${APPIMAGE_ARCH}.AppImage QuickMind.AppDir "./dist/QuickMind-${VERSION}-${APPIMAGE_ARCH}.AppImage"
+        
+        echo "AppImage created:"
+        ls -lh ./dist/*.AppImage
+    
+    - name: Upload AppImage
+      uses: actions/upload-artifact@v4
+      with:
+        name: quickmind-appimage-${{ matrix.arch }}
+        path: ./dist/*.AppImage
+
+  build-flatpak:
+    needs: build-linux-binaries
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Flatpak tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y flatpak flatpak-builder
+        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "workflow_call" ]; then
+          echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=2.1.2-dev" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Download Linux binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: quickmind-linux-x64
+        path: ./binaries/
+    
+    - name: Create Flatpak manifest
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        
+        mkdir -p flatpak-build
+        
+        # Create manifest
+        cat > flatpak-build/com.quickmind.QuickMind.yml << EOF
+        app-id: com.quickmind.QuickMind
+        runtime: org.freedesktop.Platform
+        runtime-version: '23.08'
+        sdk: org.freedesktop.Sdk
+        command: QuickMind
+        
+        finish-args:
+          - --share=ipc
+          - --socket=x11
+          - --socket=wayland
+          - --device=dri
+          - --filesystem=home
+          - --talk-name=org.freedesktop.Notifications
+        
+        modules:
+          - name: quickmind
+            buildsystem: simple
+            build-commands:
+              - install -Dm755 QuickMind /app/bin/QuickMind
+              - install -Dm755 *.dll /app/bin/
+              - install -Dm755 *.so* /app/bin/ || true
+              - install -Dm644 quickmind.desktop /app/share/applications/com.quickmind.QuickMind.desktop
+              - install -Dm644 quickmind.png /app/share/icons/hicolor/256x256/apps/com.quickmind.QuickMind.png
+            sources:
+              - type: dir
+                path: ../binaries
+              - type: file
+                path: ../Assets/QuickMindLogo.png
+                dest-filename: quickmind.png
+              - type: file
+                dest-filename: quickmind.desktop
+                contents: |
+                  [Desktop Entry]
+                  Name=QuickMind
+                  Comment=Flash Cards Learning Application
+                  Exec=QuickMind
+                  Icon=com.quickmind.QuickMind
+                  Terminal=false
+                  Type=Application
+                  Categories=Education;
+                  StartupWMClass=QuickMind
+        EOF
+        
+        echo "Flatpak manifest created"
+        cat flatpak-build/com.quickmind.QuickMind.yml
+    
+    - name: Build Flatpak
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        
+        cd flatpak-build
+        
+        # Build the flatpak
+        flatpak-builder --force-clean --repo=repo build-dir com.quickmind.QuickMind.yml
+        
+        # Export as bundle
+        mkdir -p "../dist"
+        flatpak build-bundle repo "../dist/QuickMind-${VERSION}.flatpak" com.quickmind.QuickMind
+        
+        echo "Flatpak created:"
+        ls -lh ../dist/*.flatpak
+    
+    - name: Upload Flatpak
+      uses: actions/upload-artifact@v4
+      with:
+        name: quickmind-flatpak
+        path: ./dist/*.flatpak
+
+  create-source-packages:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "workflow_call" ]; then
+          echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=2.1.2-dev" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create Arch Linux PKGBUILD
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        
+        mkdir -p arch-package
+        
+        cat > arch-package/PKGBUILD << EOF
+        # Maintainer: QuickMind Team <contact@quickmind.app>
+        
+        pkgname=quickmind
+        pkgver=${VERSION}
+        pkgrel=1
+        pkgdesc="Flash Cards Learning Application built with .NET and Avalonia UI"
+        arch=('x86_64' 'aarch64')
+        url="https://github.com/ddenvy/QuickMind"
+        license=('MIT')
+        depends=('dotnet-runtime>=9.0' 'gtk3' 'libx11' 'libxrandr' 'libxi')
+        makedepends=('dotnet-sdk>=9.0' 'git')
+        source=("git+https://github.com/ddenvy/QuickMind.git#tag=v\${pkgver}")
+        sha256sums=('SKIP')
+        
+        build() {
+            cd "\${srcdir}/QuickMind"
+            
+            # Restore dependencies
+            dotnet restore
+            
+            # Build for current architecture
+            case "\${CARCH}" in
+                x86_64)
+                    dotnet publish -c Release -r linux-x64 --self-contained false -o "\${srcdir}/build"
+                    ;;
+                aarch64)
+                    dotnet publish -c Release -r linux-arm64 --self-contained false -o "\${srcdir}/build"
+                    ;;
+            esac
+        }
+        
+        package() {
+            # Install binaries
+            install -dm755 "\${pkgdir}/usr/bin"
+            install -dm755 "\${pkgdir}/usr/share/quickmind"
+            install -dm755 "\${pkgdir}/usr/share/applications"
+            install -dm755 "\${pkgdir}/usr/share/pixmaps"
+            install -dm755 "\${pkgdir}/usr/share/licenses/\${pkgname}"
+            
+            # Copy application files
+            cp -r "\${srcdir}/build"/* "\${pkgdir}/usr/share/quickmind/"
+            
+            # Create launcher script
+            cat > "\${pkgdir}/usr/bin/quickmind" << 'EOFSCRIPT'
+        #!/bin/bash
+        exec /usr/share/quickmind/QuickMind "\$@"
+        EOFSCRIPT
+            chmod +x "\${pkgdir}/usr/bin/quickmind"
+            
+            # Install desktop file
+            cat > "\${pkgdir}/usr/share/applications/quickmind.desktop" << 'EOFDESKTOP'
+        [Desktop Entry]
+        Name=QuickMind
+        Comment=Flash Cards Learning Application
+        Exec=quickmind
+        Icon=quickmind
+        Terminal=false
+        Type=Application
+        Categories=Education;
+        StartupWMClass=QuickMind
+        EOFDESKTOP
+            
+            # Install icon
+            install -Dm644 "\${srcdir}/QuickMind/Assets/QuickMindLogo.png" "\${pkgdir}/usr/share/pixmaps/quickmind.png"
+            
+            # Install license
+            install -Dm644 "\${srcdir}/QuickMind/LICENSE.txt" "\${pkgdir}/usr/share/licenses/\${pkgname}/LICENSE"
+        }
+        EOF
+        
+        echo "PKGBUILD created for Arch Linux"
+    
+    - name: Create Gentoo ebuild
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        
+        mkdir -p gentoo-package/app-misc/quickmind
+        
+        cat > gentoo-package/app-misc/quickmind/quickmind-${VERSION}.ebuild << EOF
+        # Copyright 2024 Gentoo Authors
+        # Distributed under the terms of the GNU General Public License v2
+        
+        EAPI=8
+        
+        inherit dotnet-pkg
+        
+        DESCRIPTION="Flash Cards Learning Application built with .NET and Avalonia UI"
+        HOMEPAGE="https://github.com/ddenvy/QuickMind"
+        SRC_URI="https://github.com/ddenvy/QuickMind/archive/v\${PV}.tar.gz -> \${P}.tar.gz"
+        
+        LICENSE="MIT"
+        SLOT="0"
+        KEYWORDS="~amd64 ~arm64"
+        
+        DEPEND="
+            >=dev-dotnet/dotnet-sdk-bin-9.0
+        "
+        RDEPEND="
+            >=dev-dotnet/dotnet-runtime-9.0
+            x11-libs/gtk+:3
+            x11-libs/libX11
+            x11-libs/libXrandr
+            x11-libs/libXi
+        "
+        
+        S="\${WORKDIR}/QuickMind-\${PV}"
+        
+        src_prepare() {
+            default
+            dotnet-pkg_src_prepare
+        }
+        
+        src_configure() {
+            dotnet-pkg_src_configure
+        }
+        
+        src_compile() {
+            local arch
+            case "\${ABI}" in
+                amd64) arch="linux-x64" ;;
+                arm64) arch="linux-arm64" ;;
+                *) die "Unsupported architecture: \${ABI}" ;;
+            esac
+            
+            dotnet publish -c Release -r "\${arch}" --self-contained false \\
+                -o "\${S}/publish" || die "Compilation failed"
+        }
+        
+        src_install() {
+            # Install application files
+            insinto /usr/share/quickmind
+            doins -r publish/*
+            fperms +x /usr/share/quickmind/QuickMind
+            
+            # Create launcher script
+            cat > "\${T}/quickmind" << 'EOF'
+        #!/bin/bash
+        exec /usr/share/quickmind/QuickMind "\$@"
+        EOF
+            dobin "\${T}/quickmind"
+            
+            # Install desktop file
+            cat > "\${T}/quickmind.desktop" << 'EOF'
+        [Desktop Entry]
+        Name=QuickMind
+        Comment=Flash Cards Learning Application
+        Exec=quickmind
+        Icon=quickmind
+        Terminal=false
+        Type=Application
+        Categories=Education;
+        StartupWMClass=QuickMind
+        EOF
+            domenu "\${T}/quickmind.desktop"
+            
+            # Install icon
+            newicon Assets/QuickMindLogo.png quickmind.png
+            
+            # Install documentation
+            einstalldocs
+        }
+        EOF
+        
+        # Create metadata.xml
+        cat > gentoo-package/app-misc/quickmind/metadata.xml << EOF
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+        <pkgmetadata>
+            <maintainer type="person">
+                <email>contact@quickmind.app</email>
+                <name>QuickMind Team</name>
+            </maintainer>
+            <longdescription>
+                QuickMind is a cross-platform flash cards application built with .NET and Avalonia UI.
+                It provides an intuitive interface for creating and studying flash cards with
+                support for multiple languages including English, Russian, and Chinese.
+            </longdescription>
+            <upstream>
+                <remote-id type="github">ddenvy/QuickMind</remote-id>
+            </upstream>
+        </pkgmetadata>
+        EOF
+        
+        echo "Gentoo ebuild created"
+    
+    - name: Create source tarball
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        
+        # Create source package excluding build artifacts
+        mkdir -p "./dist"
+        
+        # Create clean source archive
+        git archive --format=tar.gz --prefix="quickmind-${VERSION}/" HEAD > "./dist/quickmind-${VERSION}-src.tar.gz"
+        
+        echo "Source tarball created:"
+        ls -lh ./dist/*.tar.gz
+    
+    - name: Upload source packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: quickmind-source-packages
+        path: |
+          ./arch-package/
+          ./gentoo-package/
+          ./dist/*.tar.gz
+
+  create-snap-package:
+    needs: build-linux-binaries
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install snapcraft
+      run: |
+        sudo snap install snapcraft --classic
+    
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "workflow_call" ]; then
+          echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=2.1.2-dev" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Download Linux binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: quickmind-linux-x64
+        path: ./binaries/
+    
+    - name: Create snapcraft.yaml
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        
+        mkdir -p snap/gui
+        
+        cat > snapcraft.yaml << EOF
+        name: quickmind
+        version: '${VERSION}'
+        summary: Flash Cards Learning Application
+        description: |
+          QuickMind is a cross-platform flash cards application built with .NET and Avalonia UI.
+          It provides an intuitive interface for creating and studying flash cards with
+          support for multiple languages including English, Russian, and Chinese.
+          
+          Features:
+          - Dark theme interface
+          - Multi-language support (English, Russian, Chinese)
+          - SQLite database storage
+          - Cross-platform compatibility
+          - Intuitive card management
+        
+        grade: stable
+        confinement: strict
+        base: core22
+        
+        architectures:
+          - build-on: amd64
+        
+        apps:
+          quickmind:
+            command: bin/QuickMind
+            plugs:
+              - home
+              - desktop
+              - desktop-legacy
+              - wayland
+              - x11
+              - opengl
+              - audio-playback
+              - network
+        
+        parts:
+          quickmind:
+            plugin: dump
+            source: ./binaries/
+            organize:
+              '*': bin/
+            stage-packages:
+              - libgcc-s1
+              - libc6
+              - libssl3
+        EOF
+        
+        # Create desktop file for snap
+        cat > snap/gui/quickmind.desktop << EOF
+        [Desktop Entry]
+        Name=QuickMind
+        Comment=Flash Cards Learning Application
+        Exec=quickmind
+        Icon=\${SNAP}/meta/gui/quickmind.png
+        Terminal=false
+        Type=Application
+        Categories=Education;
+        StartupWMClass=QuickMind
+        EOF
+        
+        # Copy icon for snap
+        if [ -f "Assets/QuickMindLogo.png" ]; then
+          cp "Assets/QuickMindLogo.png" snap/gui/quickmind.png
+        fi
+        
+        echo "snapcraft.yaml created"
+    
+    - name: Build snap
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        
+        # Build the snap
+        snapcraft --destructive-mode
+        
+        # Move to dist directory
+        mkdir -p "./dist"
+        mv *.snap "./dist/"
+        
+        echo "Snap package created:"
+        ls -lh ./dist/*.snap
+    
+    - name: Upload Snap package
+      uses: actions/upload-artifact@v4
+      with:
+        name: quickmind-snap
+        path: ./dist/*.snap 
