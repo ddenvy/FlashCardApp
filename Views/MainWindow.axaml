@@ -86,11 +86,11 @@
                                             <TextBlock Grid.Column="0" Text="{Binding Question}" TextWrapping="Wrap" Foreground="#FFFFFF"/>
                                             
                                             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                                <Button Content="Edit" ToolTip.Tip="Edit"
+                                                <Button Content="{Binding $parent[Window].DataContext.EditLabel}" ToolTip.Tip="{Binding $parent[Window].DataContext.EditLabel}"
                                                         Command="{Binding $parent[Window].DataContext.EditCardCommand}"
                                                         CommandParameter="{Binding}"
                                                         FontSize="10" Margin="2,0"/>
-                                                <Button Content="Del" ToolTip.Tip="Delete"
+                                                <Button Content="{Binding $parent[Window].DataContext.DeleteLabel}" ToolTip.Tip="{Binding $parent[Window].DataContext.DeleteLabel}"
                                                         Command="{Binding $parent[Window].DataContext.DeleteCardCommand}"
                                                         CommandParameter="{Binding}"
                                                         FontSize="10" Margin="2,0"
@@ -130,11 +130,11 @@
                                             <TextBlock Grid.Column="0" Text="{Binding Question}" TextWrapping="Wrap" Foreground="#FFFFFF"/>
                                             
                                             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                                <Button Content="Edit" ToolTip.Tip="Edit"
+                                                <Button Content="{Binding $parent[Window].DataContext.EditLabel}" ToolTip.Tip="{Binding $parent[Window].DataContext.EditLabel}"
                                                         Command="{Binding $parent[Window].DataContext.EditCardCommand}"
                                                         CommandParameter="{Binding}"
                                                         FontSize="10" Margin="2,0"/>
-                                                <Button Content="Del" ToolTip.Tip="Delete"
+                                                <Button Content="{Binding $parent[Window].DataContext.DeleteLabel}" ToolTip.Tip="{Binding $parent[Window].DataContext.DeleteLabel}"
                                                         Command="{Binding $parent[Window].DataContext.DeleteCardCommand}"
                                                         CommandParameter="{Binding}"
                                                         FontSize="10" Margin="2,0"
@@ -174,11 +174,11 @@
                                             <TextBlock Grid.Column="0" Text="{Binding Question}" TextWrapping="Wrap" Foreground="#FFFFFF"/>
                                             
                                             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                                <Button Content="Edit" ToolTip.Tip="Edit"
+                                                <Button Content="{Binding $parent[Window].DataContext.EditLabel}" ToolTip.Tip="{Binding $parent[Window].DataContext.EditLabel}"
                                                         Command="{Binding $parent[Window].DataContext.EditCardCommand}"
                                                         CommandParameter="{Binding}"
                                                         FontSize="10" Margin="2,0"/>
-                                                <Button Content="Del" ToolTip.Tip="Delete"
+                                                <Button Content="{Binding $parent[Window].DataContext.DeleteLabel}" ToolTip.Tip="{Binding $parent[Window].DataContext.DeleteLabel}"
                                                         Command="{Binding $parent[Window].DataContext.DeleteCardCommand}"
                                                         CommandParameter="{Binding}"
                                                         FontSize="10" Margin="2,0"
