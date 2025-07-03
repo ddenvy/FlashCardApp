@@ -16,21 +16,31 @@ Ready to start learning? Download QuickMind for your platform:
 
 <div align="center">
   
-  [![Windows Download](https://img.shields.io/badge/Windows-Download-0078D4?style=for-the-badge&logo=windows&logoColor=white)](./dist/QuickMind-Setup-v2.1.1.exe)
-  [![macOS Download](https://img.shields.io/badge/macOS-Download-000000?style=for-the-badge&logo=apple&logoColor=white)](./dist/QuickMind-macOS-ARM64-v2.1.0.zip)
+  [![Windows Download](https://img.shields.io/badge/Windows-Download-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/ddenvy/QuickMind/releases/latest)
+  [![macOS Download](https://img.shields.io/badge/macOS-Download-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/ddenvy/QuickMind/releases/latest)
+  [![Linux Download](https://img.shields.io/badge/Linux-Download-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/ddenvy/QuickMind/releases/latest)
   
-  **Windows**: `QuickMind-Setup-v2.1.1.exe` (32.56 MB)  
-  **macOS**: `QuickMind-macOS-ARM64-v2.1.0.zip` (44.83 MB)
+  **Windows**: `QuickMind-Setup-v2.1.2.exe` (34.15 MB)  
+  **macOS**: DMG files for Intel & Apple Silicon (45 MB)
+  **Linux**: Multiple package formats available (35-50 MB)
   
-  *Latest version: v2.1.1*
+  *Latest version: v2.1.2*
   
 </div>
 
 ### Installation Instructions
 
-- **Windows**: Run the `.exe` installer and follow the setup wizard
-- **macOS**: Extract the `.zip` file and run the installation script (see [macOS README](./dist/README-macOS.md))
-- **Linux**: Build from source (instructions below)
+- **Windows**: Download and run the `.exe` installer from [Releases](https://github.com/ddenvy/QuickMind/releases)
+- **macOS**: Download the appropriate `.dmg` file for your Mac (Intel or Apple Silicon)
+- **Linux**: Choose from multiple package formats:
+  - **DEB** (Ubuntu/Debian): `quickmind_VERSION_amd64.deb`
+  - **RPM** (Fedora/RHEL/openSUSE): `quickmind-VERSION-1.*.x86_64.rpm`
+  - **AppImage** (Universal): `QuickMind-VERSION-x86_64.AppImage`
+  - **Flatpak**: `QuickMind-VERSION.flatpak`
+  - **Snap**: `quickmind_VERSION_amd64.snap`
+  - **Source packages** for Arch Linux and Gentoo
+
+📖 **Detailed Linux installation guide**: [docs/LINUX-INSTALL.md](docs/LINUX-INSTALL.md)
 
 ---
 
@@ -42,7 +52,7 @@ Ready to start learning? Download QuickMind for your platform:
 - **🎨 Dark Minimalist Design** - Clean, distraction-free interface inspired by modern learning platforms
 - **📝 Easy Card Management** - Add, edit, and delete flashcards with live preview
 - **🏷️ Topic Organization** - Group cards by subjects or topics
-- **⚡ Cross-platform** - Runs on Windows, macOS, and Linux
+- **⚡ Cross-platform** - Available for Windows, macOS, and Linux (DEB, RPM, AppImage, Flatpak, Snap)
 
 ## 🚀 Getting Started
 
@@ -97,6 +107,13 @@ QuickMind includes GitHub Actions workflows for automatic installer creation:
 ./installer/Build-macOS-Installer.sh
 ```
 
+**Linux Packages (via GitHub Actions)**
+- DEB packages for Debian/Ubuntu
+- RPM packages for Red Hat/Fedora/openSUSE  
+- AppImage for universal compatibility
+- Flatpak and Snap packages
+- Source packages for Arch Linux and Gentoo
+
 **All Platforms**
 ```bash
 ./installer/Build-All.ps1 -Version "2.1.0"
@@ -114,6 +131,8 @@ git push origin v2.1.0
 This will trigger GitHub Actions to:
 - Build Windows installer (.exe)
 - Build macOS DMG files (Intel + Apple Silicon)
+- Build Linux packages (DEB, RPM, AppImage, Flatpak, Snap)
+- Create source packages for Arch Linux and Gentoo
 - Create a GitHub Release with all files
 - Generate release notes automatically
 

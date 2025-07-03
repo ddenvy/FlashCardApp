@@ -286,9 +286,9 @@ jobs:
           - **quickmind-${{ steps.get_version.outputs.VERSION }}-1.*.x86_64.rpm** - Red Hat/Fedora/openSUSE (x64)
           - **quickmind-${{ steps.get_version.outputs.VERSION }}-1.*.aarch64.rpm** - Red Hat/Fedora/openSUSE (ARM64)
           - **QuickMind-${{ steps.get_version.outputs.VERSION }}-x86_64.AppImage** - Универсальный AppImage (x64)
-          - **QuickMind-${{ steps.get_version.outputs.VERSION }}-aarch64.AppImage** - Универсальный AppImage (ARM64)
+          
           - **QuickMind-${{ steps.get_version.outputs.VERSION }}.flatpak** - Flatpak пакет
-          - **quickmind_${{ steps.get_version.outputs.VERSION }}_amd64.snap** - Snap пакет
+  
           
           ### 📋 Инструкции по установке
           
@@ -332,10 +332,7 @@ jobs:
           flatpak run com.quickmind.QuickMind
           ```
           
-          **Snap:**
-          ```bash
-          sudo snap install quickmind_${{ steps.get_version.outputs.VERSION }}_amd64.snap --dangerous
-          ```
+
           
           **Arch Linux:**
           Используйте PKGBUILD из архива quickmind-${{ steps.get_version.outputs.VERSION }}-src.tar.gz
@@ -380,9 +377,9 @@ jobs:
           quickmind-rpm-linux-x64/*.rpm
           quickmind-rpm-linux-arm64/*.rpm
           quickmind-appimage-linux-x64/*.AppImage
-          quickmind-appimage-linux-arm64/*.AppImage
+
           quickmind-flatpak/*.flatpak
-          quickmind-snap/*.snap
+
           quickmind-source-packages/*.tar.gz
         draft: false
         prerelease: false
