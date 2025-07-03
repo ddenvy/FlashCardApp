@@ -1,6 +1,6 @@
 # Build Windows Installer for QuickMind
 param(
-    [string]$Version = "2.1.1",
+    [string]$Version = "2.1.2",
     [string]$Configuration = "Release"
 )
 

@@ -13,8 +13,8 @@
     <Product>QuickMind</Product>
     <AssemblyTitle>QuickMind - Flash Cards Learning App</AssemblyTitle>
     <AssemblyDescription>A cross-platform flash cards application for efficient learning</AssemblyDescription>
-    <Version>2.1.1</Version>
-    <FileVersion>2.1.1</FileVersion>
+    <Version>2.1.2</Version>
+    <FileVersion>2.1.2</FileVersion>
     <Company>QuickMind</Company>
     <Copyright>Copyright © 2024 QuickMind</Copyright>
   </PropertyGroup>

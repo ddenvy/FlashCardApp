@@ -11,7 +11,7 @@ on:
       version:
         description: 'Version to build'
         required: true
-        default: '2.1.0'
+        default: '2.1.2'
 
 permissions:
   contents: write
@@ -41,7 +41,7 @@ jobs:
         elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
           echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
         else
-          echo "VERSION=2.1.0-dev" >> $GITHUB_OUTPUT
+          echo "VERSION=2.1.2-dev" >> $GITHUB_OUTPUT
         fi
     
     - name: Restore dependencies
