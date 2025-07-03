@@ -91,6 +91,9 @@ jobs:
         
         echo "Creating .app bundle for $ARCH..."
         
+        # Ensure dist directory exists
+        mkdir -p "./dist"
+        
         # Create .app bundle structure
         APP_DIR="./dist/$APP_NAME-$ARCH.app"
         mkdir -p "$APP_DIR/Contents/MacOS"
@@ -175,11 +178,18 @@ jobs:
         
         echo "Creating DMG for $ARCH..."
         
+        # Ensure dist directory exists
+        mkdir -p "./dist"
+        
         # Create temporary directory for DMG content
         DMG_DIR="./dist/dmg_temp_$ARCH"
         mkdir -p "$DMG_DIR"
         
-        # Copy app to DMG directory  
+        # Copy app to DMG directory
+        if [ ! -d "./dist/$APP_NAME-$ARCH.app" ]; then
+          echo "Error: App bundle not found at ./dist/$APP_NAME-$ARCH.app"
+          exit 1
+        fi
         cp -r "./dist/$APP_NAME-$ARCH.app" "$DMG_DIR/"
         
         # Create symlink to Applications
@@ -187,6 +197,13 @@ jobs:
         
         # Create DMG
         DMG_NAME="$APP_NAME-$ARCH-v$VERSION.dmg"
+        
+        # Remove existing DMG if it exists
+        if [ -f "./dist/$DMG_NAME" ]; then
+          echo "Removing existing DMG file..."
+          rm -f "./dist/$DMG_NAME"
+        fi
+        
         hdiutil create -srcfolder "$DMG_DIR" -volname "$APP_NAME v$VERSION ($ARCH)" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDBZ -size 200m "./dist/$DMG_NAME"
         
         # Clean up
