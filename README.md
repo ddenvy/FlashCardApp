@@ -117,7 +117,7 @@ This will trigger GitHub Actions to:
 - Create a GitHub Release with all files
 - Generate release notes automatically
 
-See [.github/README.md](.github/README.md) for detailed workflow documentation.
+See [.github/WORKFLOWS.md](.github/WORKFLOWS.md) for detailed workflow documentation.
 
 ## 📖 How to Use
 
@@ -220,7 +220,7 @@ If you encounter any issues or have questions:
 ---
 
 <div align="center">
-  Made with ❤️ for learners everywhere
+  Made with ❤️ for learners everywhere !
   
   **Happy Learning! 🎓**
 </div> 
