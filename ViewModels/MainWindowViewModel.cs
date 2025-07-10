@@ -113,26 +113,71 @@ public partial class MainWindowViewModel : ViewModelBase
     public string StudyModeLabel => _localizationService.GetString("StudyMode");
     public string EditLabel => _localizationService.GetString("Edit");
     public string DeleteLabel => _localizationService.GetString("Delete");
+    public string MoveToLearningTooltip => _localizationService.GetString("MoveToLearning");
+    public string MoveToKnownTooltip => _localizationService.GetString("MoveToKnown");
+    public string MoveToNewTooltip => _localizationService.GetString("MoveToNew");
 
     public ICommand AddCardCommand { get; private set; } = null!;
     public ICommand RefreshCommand { get; private set; } = null!;
-            public ICommand EditCardCommand { get; private set; } = null!;
-        public ICommand DeleteCardCommand { get; private set; } = null!;
-        public ICommand StartStudyCommand { get; private set; } = null!;
-        public ICommand ShowLanguageSelectionCommand { get; private set; } = null!;
+    public ICommand EditCardCommand { get; private set; } = null!;
+    public ICommand DeleteCardCommand { get; private set; } = null!;
+    public ICommand StartStudyCommand { get; private set; } = null!;
+    public ICommand ShowLanguageSelectionCommand { get; private set; } = null!;
+    public ICommand ImportCardsCommand { get; private set; } = null!;
+    public ICommand DeleteTopicCommand { get; private set; } = null!;
+    public ICommand MoveToNewCommand { get; private set; } = null!;
+    public ICommand MoveToLearningCommand { get; private set; } = null!;
+    public ICommand MoveToKnownCommand { get; private set; } = null!;
 
     public ObservableCollection<FlashCard> NewCards => _newCards;
     public ObservableCollection<FlashCard> LearningCards => _learningCards;
     public ObservableCollection<FlashCard> KnownCards => _knownCards;
 
+    public async void MoveCardToStatus(FlashCard card, CardStatus newStatus)
+    {
+        if (card.Status == newStatus)
+            return;
+        try
+        {
+            card.Status = newStatus;
+            await _cardService.UpdateCardAsync(card);
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error moving card: {ex.Message}");
+        }
+    }
+
+    private async Task MoveCardToStatusAsync(FlashCard card, CardStatus newStatus)
+    {
+        if (card.Status == newStatus)
+            return;
+        try
+        {
+            card.Status = newStatus;
+            await _cardService.UpdateCardAsync(card);
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error moving card: {ex.Message}");
+        }
+    }
+
     private void InitializeCommands()
     {
-        AddCardCommand = new RelayCommand(async () => await AddCardAsync());
+        AddCardCommand = new RelayCommand(() => AddCardAsync());
         RefreshCommand = new RelayCommand(async () => await LoadDataAsync());
-        EditCardCommand = new RelayCommand<FlashCard>(async (card) => await EditCardAsync(card));
+        EditCardCommand = new RelayCommand<FlashCard>((card) => EditCardAsync(card));
         DeleteCardCommand = new RelayCommand<FlashCard>(async (card) => await DeleteCardAsync(card));
         StartStudyCommand = new RelayCommand(StartStudy);
-        ShowLanguageSelectionCommand = new RelayCommand(async () => await ShowLanguageSelectionAsync());
+        ShowLanguageSelectionCommand = new RelayCommand(() => ShowLanguageSelectionAsync());
+        ImportCardsCommand = new RelayCommand(() => ImportCardsAsync());
+        DeleteTopicCommand = new RelayCommand(async () => await DeleteTopicAsync());
+        MoveToNewCommand = new RelayCommand<FlashCard>(async (card) => await MoveCardToStatusAsync(card, CardStatus.New));
+        MoveToLearningCommand = new RelayCommand<FlashCard>(async (card) => await MoveCardToStatusAsync(card, CardStatus.Learning));
+        MoveToKnownCommand = new RelayCommand<FlashCard>(async (card) => await MoveCardToStatusAsync(card, CardStatus.Known));
     }
 
     private async Task LoadDataAsync()
@@ -215,7 +260,7 @@ public partial class MainWindowViewModel : ViewModelBase
         return topicMatch && statusMatch;
     }
 
-    private async Task AddCardAsync()
+    private void AddCardAsync()
     {
         try
         {
@@ -238,7 +283,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private async Task EditCardAsync(FlashCard? card)
+    private void EditCardAsync(FlashCard? card)
     {
         if (card == null) return;
 
@@ -300,7 +345,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private async Task ShowLanguageSelectionAsync()
+    private void ShowLanguageSelectionAsync()
     {
         try
         {
@@ -310,6 +355,48 @@ public partial class MainWindowViewModel : ViewModelBase
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error opening language selection: {ex.Message}");
+        }
+    }
+
+    private void ImportCardsAsync()
+    {
+        try
+        {
+            var importService = new ImportService(_cardService);
+            var viewModel = new ImportDialogViewModel(importService);
+            var dialog = new Views.ImportDialog(viewModel);
+            
+            dialog.Show();
+            
+            dialog.Closed += async (s, e) =>
+            {
+                await LoadDataAsync();
+            };
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error opening import dialog: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteTopicAsync()
+    {
+        var allTopicsString = _localizationService.GetString("All");
+        if (SelectedTopic == allTopicsString)
+            return;
+        try
+        {
+            using var context = new FlashCardContext();
+            var cards = context.FlashCards.Where(c => c.Topic == SelectedTopic).ToList();
+            if (cards.Count == 0)
+                return;
+            context.FlashCards.RemoveRange(cards);
+            await context.SaveChangesAsync();
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error deleting topic: {ex.Message}");
         }
     }
 
@@ -325,6 +412,9 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(StudyModeLabel));
         OnPropertyChanged(nameof(EditLabel));
         OnPropertyChanged(nameof(DeleteLabel));
+        OnPropertyChanged(nameof(MoveToLearningTooltip));
+        OnPropertyChanged(nameof(MoveToKnownTooltip));
+        OnPropertyChanged(nameof(MoveToNewTooltip));
         
         var allTopicsString = _localizationService.GetString("All");
         

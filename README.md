@@ -49,6 +49,7 @@ Ready to start learning? Download QuickMind for your platform:
 - **📚 Smart Flashcard System** - Organize your learning with three card states: New, Learning, and Known
 - **🎯 Study Mode** - Interactive learning experience with progress tracking
 - **🌍 Multi-language Support** - English, Russian, and Chinese interface
+- **🈯 Localized tooltips for card move/return buttons** - All tooltips for moving cards between columns are now fully localized and automatically change with the interface language
 - **🎨 Dark Minimalist Design** - Clean, distraction-free interface inspired by modern learning platforms
 - **📝 Easy Card Management** - Add, edit, and delete flashcards with live preview
 - **🏷️ Topic Organization** - Group cards by subjects or topics

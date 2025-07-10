@@ -1,0 +1,136 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuickMind.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+        x:Class="QuickMind.Views.ImportDialog"
+        x:DataType="vm:ImportDialogViewModel"
+        Title="Импорт карточек"
+        Width="500" Height="400"
+        Background="#1E1E1E"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+
+    <Design.DataContext>
+        <vm:ImportDialogViewModel/>
+    </Design.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <TextBlock Grid.Row="0" 
+                   Text="Импорт карточек из файла" 
+                   FontSize="18" 
+                   FontWeight="Bold" 
+                   Foreground="#FFFFFF" 
+                   Margin="0,0,0,20"/>
+
+        <!-- Выбор файла -->
+        <Grid Grid.Row="1" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBox Grid.Column="0" 
+                     Text="{Binding SelectedFilePath}" 
+                     Watermark="Путь к файлу..."
+                     Background="#2A2A2A" 
+                     Foreground="#FFFFFF"
+                     Margin="0,0,10,0"/>
+            
+            <Button Grid.Column="1" 
+                    Content="Обзор" 
+                    Click="OnSelectFileClick"
+                    MinWidth="80"/>
+        </Grid>
+
+        <!-- Выбор темы -->
+        <Grid Grid.Row="2" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Column="0" 
+                       Text="Тема:" 
+                       Foreground="#FFFFFF" 
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"/>
+            
+            <ComboBox Grid.Column="1" 
+                      ItemsSource="{Binding ExistingTopics}"
+                      SelectedItem="{Binding SelectedTopic, Mode=TwoWay}"
+                      Background="#2A2A2A" 
+                      Foreground="#FFFFFF"
+                      Margin="0,0,10,0"/>
+            <TextBox Grid.Column="2"
+                     Text="{Binding SelectedTopic, Mode=TwoWay}"
+                     Watermark="Введите новую тему"
+                     Background="#2A2A2A"
+                     Foreground="#FFFFFF"/>
+        </Grid>
+
+        <!-- Информация о формате -->
+        <Border Grid.Row="3" 
+                Background="#2A2A2A" 
+                BorderBrush="#333333" 
+                BorderThickness="1" 
+                Margin="0,0,0,15"
+                Padding="10">
+            <StackPanel>
+                <TextBlock Text="Поддерживаемые форматы:" 
+                           FontWeight="Bold" 
+                           Foreground="#FFFFFF" 
+                           Margin="0,0,0,5"/>
+                <TextBlock Text="• TXT файлы: вопрос[Tab]ответ" 
+                           Foreground="#CCCCCC" 
+                           FontSize="12"/>
+                <TextBlock Text="• CSV файлы: вопрос,ответ" 
+                           Foreground="#CCCCCC" 
+                           FontSize="12"/>
+                <TextBlock Text="• Каждая карточка на новой строке" 
+                           Foreground="#CCCCCC" 
+                           FontSize="12"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Статус -->
+        <Border Grid.Row="4" 
+                Background="#2A2A2A" 
+                BorderBrush="#333333" 
+                BorderThickness="1" 
+                Margin="0,0,0,15"
+                Padding="10">
+            <TextBlock Text="{Binding StatusMessage}" 
+                       Foreground="#FFFFFF" 
+                       TextWrapping="Wrap"/>
+        </Border>
+
+        <!-- Кнопки -->
+        <StackPanel Grid.Row="5" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right">
+            <Button Content="Отмена" 
+                    Click="OnCancelClick"
+                    Margin="0,0,10,0"
+                    MinWidth="80"/>
+            <Button Content="Импорт" 
+                    Click="OnImportClick"
+                    IsEnabled="{Binding IsImporting, Converter={x:Static BoolConverters.Not}}"
+                    Classes="primary"
+                    MinWidth="80"/>
+        </StackPanel>
+    </Grid>
+
+</Window> 

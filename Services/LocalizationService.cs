@@ -194,7 +194,10 @@ namespace QuickMind.Services
                 { "DeleteConfirmation", "Delete card?\n\nQuestion: {0}" },
                 { "DeleteConfirmationTitle", "Delete Confirmation" },
                 { "Error", "Error" },
-                { "DeleteError", "Error deleting card: {0}" }
+                { "DeleteError", "Error deleting card: {0}" },
+                { "MoveToLearning", "Move to learning" },
+                { "MoveToKnown", "Move to known" },
+                { "MoveToNew", "Move to new" }
             };
         }
 
@@ -239,7 +242,10 @@ namespace QuickMind.Services
                 { "DeleteConfirmation", "Удалить карточку?\n\nВопрос: {0}" },
                 { "DeleteConfirmationTitle", "Подтверждение удаления" },
                 { "Error", "Ошибка" },
-                { "DeleteError", "Ошибка при удалении карточки: {0}" }
+                { "DeleteError", "Ошибка при удалении карточки: {0}" },
+                { "MoveToLearning", "Переместить в изучаемые" },
+                { "MoveToKnown", "Переместить в изученные" },
+                { "MoveToNew", "Вернуть в новые" }
             };
         }
 
@@ -284,7 +290,10 @@ namespace QuickMind.Services
                 { "DeleteConfirmation", "删除卡片吗？\n\n问题：{0}" },
                 { "DeleteConfirmationTitle", "删除确认" },
                 { "Error", "错误" },
-                { "DeleteError", "删除卡片时出错：{0}" }
+                { "DeleteError", "删除卡片时出错：{0}" },
+                { "MoveToLearning", "移到学习中" },
+                { "MoveToKnown", "移到已掌握" },
+                { "MoveToNew", "移回新卡" }
             };
         }
 
