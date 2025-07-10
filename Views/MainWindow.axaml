@@ -48,17 +48,21 @@
                 <Button Content="{Binding AddCardLabel}"
                         Command="{Binding AddCardCommand}"
                         Margin="0,0,5,0"/>
-                <Button Content="📥 Импорт" 
-                        Command="{Binding ImportCardsCommand}"
-                        ToolTip.Tip="Импорт карточек из файла"
-                        Margin="0,0,5,0"/>
+                <Button Command="{Binding ImportCardsCommand}" ToolTip.Tip="{Binding ImportLabel}" Margin="0,0,5,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📥" Margin="0,0,4,0"/>
+                        <TextBlock Text="{Binding ImportLabel}"/>
+                    </StackPanel>
+                </Button>
                 <Button Content="🌐 Lang" 
                         Command="{Binding ShowLanguageSelectionCommand}"
                         ToolTip.Tip="Language Selection"/>
-                <Button Content="🗑 Удалить тему"
-                        Command="{Binding DeleteTopicCommand}"
-                        ToolTip.Tip="Удалить все карточки выбранной темы"
-                        Margin="0,0,5,0"/>
+                <Button Command="{Binding DeleteTopicCommand}" ToolTip.Tip="{Binding DeleteTopicLabel}" Margin="0,0,5,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🗑" Margin="0,0,4,0"/>
+                        <TextBlock Text="{Binding DeleteTopicLabel}"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Grid>
         

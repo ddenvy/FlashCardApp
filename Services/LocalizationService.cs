@@ -197,7 +197,20 @@ namespace QuickMind.Services
                 { "DeleteError", "Error deleting card: {0}" },
                 { "MoveToLearning", "Move to learning" },
                 { "MoveToKnown", "Move to known" },
-                { "MoveToNew", "Move to new" }
+                { "MoveToNew", "Move to new" },
+                { "Import", "Import" },
+                { "DeleteTopic", "Delete topic" },
+                { "ImportDialogTitle", "Import Cards" },
+                { "ImportDialogHeader", "Import cards from file" },
+                { "ImportDialogFilePathWatermark", "File path..." },
+                { "ImportDialogBrowse", "Browse" },
+                { "ImportDialogTopic", "Topic:" },
+                { "ImportDialogTopicWatermark", "Enter new topic" },
+                { "ImportDialogFormatHeader", "Supported formats:" },
+                { "ImportDialogFormatTxt", "• TXT files: question[Tab]answer" },
+                { "ImportDialogFormatCsv", "• CSV files: question,answer" },
+                { "ImportDialogFormatEachLine", "• Each card on a new line" },
+                { "ImportDialogCancel", "Cancel" }
             };
         }
 
@@ -245,7 +258,20 @@ namespace QuickMind.Services
                 { "DeleteError", "Ошибка при удалении карточки: {0}" },
                 { "MoveToLearning", "Переместить в изучаемые" },
                 { "MoveToKnown", "Переместить в изученные" },
-                { "MoveToNew", "Вернуть в новые" }
+                { "MoveToNew", "Вернуть в новые" },
+                { "Import", "Импорт" },
+                { "DeleteTopic", "Удалить тему" },
+                { "ImportDialogTitle", "Импорт карточек" },
+                { "ImportDialogHeader", "Импорт карточек из файла" },
+                { "ImportDialogFilePathWatermark", "Путь к файлу..." },
+                { "ImportDialogBrowse", "Обзор" },
+                { "ImportDialogTopic", "Тема:" },
+                { "ImportDialogTopicWatermark", "Введите новую тему" },
+                { "ImportDialogFormatHeader", "Поддерживаемые форматы:" },
+                { "ImportDialogFormatTxt", "• TXT файлы: вопрос[Tab]ответ" },
+                { "ImportDialogFormatCsv", "• CSV файлы: вопрос,ответ" },
+                { "ImportDialogFormatEachLine", "• Каждая карточка на новой строке" },
+                { "ImportDialogCancel", "Отмена" }
             };
         }
 
@@ -293,7 +319,20 @@ namespace QuickMind.Services
                 { "DeleteError", "删除卡片时出错：{0}" },
                 { "MoveToLearning", "移到学习中" },
                 { "MoveToKnown", "移到已掌握" },
-                { "MoveToNew", "移回新卡" }
+                { "MoveToNew", "移回新卡" },
+                { "Import", "导入" },
+                { "DeleteTopic", "删除主题" },
+                { "ImportDialogTitle", "导入卡片" },
+                { "ImportDialogHeader", "从文件导入卡片" },
+                { "ImportDialogFilePathWatermark", "文件路径..." },
+                { "ImportDialogBrowse", "浏览" },
+                { "ImportDialogTopic", "主题:" },
+                { "ImportDialogTopicWatermark", "输入新主题" },
+                { "ImportDialogFormatHeader", "支持的格式:" },
+                { "ImportDialogFormatTxt", "• TXT 文件: 问题[Tab]答案" },
+                { "ImportDialogFormatCsv", "• CSV 文件: 问题,答案" },
+                { "ImportDialogFormatEachLine", "• 每张卡片一行" },
+                { "ImportDialogCancel", "取消" }
             };
         }
 

@@ -6,7 +6,7 @@
         mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
         x:Class="QuickMind.Views.ImportDialog"
         x:DataType="vm:ImportDialogViewModel"
-        Title="Импорт карточек"
+        Title="{Binding ImportDialogTitle}"
         Width="500" Height="400"
         Background="#1E1E1E"
         CanResize="False"
@@ -28,7 +28,7 @@
 
         <!-- Заголовок -->
         <TextBlock Grid.Row="0" 
-                   Text="Импорт карточек из файла" 
+                   Text="{Binding ImportDialogHeader}" 
                    FontSize="18" 
                    FontWeight="Bold" 
                    Foreground="#FFFFFF" 
@@ -43,13 +43,13 @@
             
             <TextBox Grid.Column="0" 
                      Text="{Binding SelectedFilePath}" 
-                     Watermark="Путь к файлу..."
+                     Watermark="{Binding ImportDialogFilePathWatermark}"
                      Background="#2A2A2A" 
                      Foreground="#FFFFFF"
                      Margin="0,0,10,0"/>
             
             <Button Grid.Column="1" 
-                    Content="Обзор" 
+                    Content="{Binding ImportDialogBrowse}" 
                     Click="OnSelectFileClick"
                     MinWidth="80"/>
         </Grid>
@@ -63,7 +63,7 @@
             </Grid.ColumnDefinitions>
             
             <TextBlock Grid.Column="0" 
-                       Text="Тема:" 
+                       Text="{Binding ImportDialogTopic}" 
                        Foreground="#FFFFFF" 
                        VerticalAlignment="Center"
                        Margin="0,0,10,0"/>
@@ -76,7 +76,7 @@
                       Margin="0,0,10,0"/>
             <TextBox Grid.Column="2"
                      Text="{Binding SelectedTopic, Mode=TwoWay}"
-                     Watermark="Введите новую тему"
+                     Watermark="{Binding ImportDialogTopicWatermark}"
                      Background="#2A2A2A"
                      Foreground="#FFFFFF"/>
         </Grid>
@@ -89,17 +89,17 @@
                 Margin="0,0,0,15"
                 Padding="10">
             <StackPanel>
-                <TextBlock Text="Поддерживаемые форматы:" 
+                <TextBlock Text="{Binding ImportDialogFormatHeader}" 
                            FontWeight="Bold" 
                            Foreground="#FFFFFF" 
                            Margin="0,0,0,5"/>
-                <TextBlock Text="• TXT файлы: вопрос[Tab]ответ" 
+                <TextBlock Text="{Binding ImportDialogFormatTxt}" 
                            Foreground="#CCCCCC" 
                            FontSize="12"/>
-                <TextBlock Text="• CSV файлы: вопрос,ответ" 
+                <TextBlock Text="{Binding ImportDialogFormatCsv}" 
                            Foreground="#CCCCCC" 
                            FontSize="12"/>
-                <TextBlock Text="• Каждая карточка на новой строке" 
+                <TextBlock Text="{Binding ImportDialogFormatEachLine}" 
                            Foreground="#CCCCCC" 
                            FontSize="12"/>
             </StackPanel>
@@ -121,11 +121,11 @@
         <StackPanel Grid.Row="5" 
                     Orientation="Horizontal" 
                     HorizontalAlignment="Right">
-            <Button Content="Отмена" 
+            <Button Content="{Binding ImportDialogCancel}" 
                     Click="OnCancelClick"
                     Margin="0,0,10,0"
                     MinWidth="80"/>
-            <Button Content="Импорт" 
+            <Button Content="{Binding ImportDialogImport}" 
                     Click="OnImportClick"
                     IsEnabled="{Binding IsImporting, Converter={x:Static BoolConverters.Not}}"
                     Classes="primary"

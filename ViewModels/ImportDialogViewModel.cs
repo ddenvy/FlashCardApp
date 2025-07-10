@@ -60,6 +60,19 @@ namespace QuickMind.ViewModels
         public ICommand ImportCommand { get; private set; } = null!;
         public ICommand CancelCommand { get; private set; } = null!;
 
+        public string ImportDialogTitle => LocalizationService.Instance.GetString("ImportDialogTitle");
+        public string ImportDialogHeader => LocalizationService.Instance.GetString("ImportDialogHeader");
+        public string ImportDialogFilePathWatermark => LocalizationService.Instance.GetString("ImportDialogFilePathWatermark");
+        public string ImportDialogBrowse => LocalizationService.Instance.GetString("ImportDialogBrowse");
+        public string ImportDialogTopic => LocalizationService.Instance.GetString("ImportDialogTopic");
+        public string ImportDialogTopicWatermark => LocalizationService.Instance.GetString("ImportDialogTopicWatermark");
+        public string ImportDialogFormatHeader => LocalizationService.Instance.GetString("ImportDialogFormatHeader");
+        public string ImportDialogFormatTxt => LocalizationService.Instance.GetString("ImportDialogFormatTxt");
+        public string ImportDialogFormatCsv => LocalizationService.Instance.GetString("ImportDialogFormatCsv");
+        public string ImportDialogFormatEachLine => LocalizationService.Instance.GetString("ImportDialogFormatEachLine");
+        public string ImportDialogCancel => LocalizationService.Instance.GetString("ImportDialogCancel");
+        public string ImportDialogImport => LocalizationService.Instance.GetString("Import");
+
         private void InitializeCommands()
         {
             SelectFileCommand = new RelayCommand(SelectFile);

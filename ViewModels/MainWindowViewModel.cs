@@ -116,6 +116,8 @@ public partial class MainWindowViewModel : ViewModelBase
     public string MoveToLearningTooltip => _localizationService.GetString("MoveToLearning");
     public string MoveToKnownTooltip => _localizationService.GetString("MoveToKnown");
     public string MoveToNewTooltip => _localizationService.GetString("MoveToNew");
+    public string ImportLabel => _localizationService.GetString("Import");
+    public string DeleteTopicLabel => _localizationService.GetString("DeleteTopic");
 
     public ICommand AddCardCommand { get; private set; } = null!;
     public ICommand RefreshCommand { get; private set; } = null!;
@@ -415,6 +417,8 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(MoveToLearningTooltip));
         OnPropertyChanged(nameof(MoveToKnownTooltip));
         OnPropertyChanged(nameof(MoveToNewTooltip));
+        OnPropertyChanged(nameof(ImportLabel));
+        OnPropertyChanged(nameof(DeleteTopicLabel));
         
         var allTopicsString = _localizationService.GetString("All");
         
