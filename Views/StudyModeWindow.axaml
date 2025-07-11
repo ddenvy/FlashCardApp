@@ -168,18 +168,28 @@
                             IsVisible="{Binding !ShowAnswer}"
                             Classes="primary"/>
                     
-                    <!-- Кнопки оценки -->
-                    <StackPanel Orientation="Horizontal" 
-                                IsVisible="{Binding ShowAnswer}">
-                        <Button Content="{Binding DontKnowLabel}" 
-                                Command="{Binding DontKnowCommand}"
-                                Margin="0,0,8,0"
-                                Classes="danger"/>
-                        
-                        <Button Content="{Binding KnowLabel}" 
-                                Command="{Binding KnowCommand}"
-                                Classes="success"/>
-                    </StackPanel>
+                    <!-- Кнопки оценки (улучшенный алгоритм) -->
+                    <WrapPanel IsVisible="{Binding ShowAnswer}" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="{Binding AgainLabel}" 
+                                Command="{Binding AgainCommand}" 
+                                Margin="0,0,8,0" 
+                                MinWidth="60"
+                                Background="#FF4444"/>
+                        <Button Content="{Binding HardLabel}" 
+                                Command="{Binding HardCommand}" 
+                                Margin="0,0,8,0" 
+                                MinWidth="60"
+                                Background="#FF8844"/>
+                        <Button Content="{Binding GoodLabel}" 
+                                Command="{Binding GoodCommand}" 
+                                Margin="0,0,8,0" 
+                                MinWidth="60"
+                                Background="#44FF44"/>
+                        <Button Content="{Binding EasyLabel}" 
+                                Command="{Binding EasyCommand}" 
+                                MinWidth="60"
+                                Background="#44FF88"/>
+                    </WrapPanel>
                 </StackPanel>
                 
                 <!-- Правые кнопки -->

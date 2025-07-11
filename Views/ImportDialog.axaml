@@ -1,23 +1,14 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:QuickMind.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
         x:Class="QuickMind.Views.ImportDialog"
-        x:DataType="vm:ImportDialogViewModel"
-        Title="{Binding ImportDialogTitle}"
+        Title="Импорт колоды"
         Width="500" Height="400"
-        Background="#1E1E1E"
         CanResize="False"
         WindowStartupLocation="CenterOwner">
-
-    <Design.DataContext>
-        <vm:ImportDialogViewModel/>
-    </Design.DataContext>
-
+    
     <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -25,112 +16,90 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
+        
         <!-- Заголовок -->
         <TextBlock Grid.Row="0" 
-                   Text="{Binding ImportDialogHeader}" 
-                   FontSize="18" 
-                   FontWeight="Bold" 
-                   Foreground="#FFFFFF" 
+                   Text="Импорт колоды из файла"
+                   FontSize="18" FontWeight="Bold"
                    Margin="0,0,0,20"/>
-
+        
+        <!-- Выбор формата -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+            <TextBlock Text="Формат файла:" FontWeight="SemiBold"/>
+            <ComboBox x:Name="FormatComboBox" 
+                      SelectedIndex="0"
+                      Margin="0,5,0,0">
+                <ComboBoxItem Content="CSV файл (вопрос, ответ, тема)"/>
+                <ComboBoxItem Content="Текстовый файл (вопрос - ответ)"/>
+                <ComboBoxItem Content="JSON файл (экспорт Anki)"/>
+                <ComboBoxItem Content="APKG файл (пакет Anki)"/>
+            </ComboBox>
+        </StackPanel>
+        
         <!-- Выбор файла -->
-        <Grid Grid.Row="1" Margin="0,0,0,15">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            
-            <TextBox Grid.Column="0" 
-                     Text="{Binding SelectedFilePath}" 
-                     Watermark="{Binding ImportDialogFilePathWatermark}"
-                     Background="#2A2A2A" 
-                     Foreground="#FFFFFF"
-                     Margin="0,0,10,0"/>
-            
-            <Button Grid.Column="1" 
-                    Content="{Binding ImportDialogBrowse}" 
-                    Click="OnSelectFileClick"
-                    MinWidth="80"/>
-        </Grid>
-
-        <!-- Выбор темы -->
-        <Grid Grid.Row="2" Margin="0,0,0,15">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
-            
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding ImportDialogTopic}" 
-                       Foreground="#FFFFFF" 
-                       VerticalAlignment="Center"
-                       Margin="0,0,10,0"/>
-            
-            <ComboBox Grid.Column="1" 
-                      ItemsSource="{Binding ExistingTopics}"
-                      SelectedItem="{Binding SelectedTopic, Mode=TwoWay}"
-                      Background="#2A2A2A" 
-                      Foreground="#FFFFFF"
-                      Margin="0,0,10,0"/>
-            <TextBox Grid.Column="2"
-                     Text="{Binding SelectedTopic, Mode=TwoWay}"
-                     Watermark="{Binding ImportDialogTopicWatermark}"
-                     Background="#2A2A2A"
-                     Foreground="#FFFFFF"/>
-        </Grid>
-
-        <!-- Информация о формате -->
-        <Border Grid.Row="3" 
-                Background="#2A2A2A" 
-                BorderBrush="#333333" 
-                BorderThickness="1" 
-                Margin="0,0,0,15"
-                Padding="10">
-            <StackPanel>
-                <TextBlock Text="{Binding ImportDialogFormatHeader}" 
-                           FontWeight="Bold" 
-                           Foreground="#FFFFFF" 
-                           Margin="0,0,0,5"/>
-                <TextBlock Text="{Binding ImportDialogFormatTxt}" 
-                           Foreground="#CCCCCC" 
-                           FontSize="12"/>
-                <TextBlock Text="{Binding ImportDialogFormatCsv}" 
-                           Foreground="#CCCCCC" 
-                           FontSize="12"/>
-                <TextBlock Text="{Binding ImportDialogFormatEachLine}" 
-                           Foreground="#CCCCCC" 
-                           FontSize="12"/>
-            </StackPanel>
-        </Border>
-
-        <!-- Статус -->
-        <Border Grid.Row="4" 
-                Background="#2A2A2A" 
-                BorderBrush="#333333" 
-                BorderThickness="1" 
-                Margin="0,0,0,15"
-                Padding="10">
-            <TextBlock Text="{Binding StatusMessage}" 
-                       Foreground="#FFFFFF" 
+        <StackPanel Grid.Row="2" Margin="0,0,0,10">
+            <TextBlock Text="Файл для импорта:" FontWeight="SemiBold"/>
+            <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="FilePathTextBox" 
+                         Grid.Column="0"
+                         IsReadOnly="True"
+                         Watermark="Выберите файл для импорта"/>
+                <Button Grid.Column="1" 
+                        Content="Обзор"
+                        Margin="5,0,0,0"
+                        Click="OnBrowseClick"/>
+            </Grid>
+        </StackPanel>
+        
+        <!-- Название темы -->
+        <StackPanel Grid.Row="3" Margin="0,0,0,10">
+            <TextBlock Text="Название темы:" FontWeight="SemiBold"/>
+            <TextBox x:Name="TopicTextBox" 
+                     Margin="0,5,0,0"
+                     Watermark="Введите название темы для импортированных карточек"/>
+        </StackPanel>
+        
+        <!-- Дополнительные настройки -->
+        <StackPanel Grid.Row="4" Margin="0,0,0,10">
+            <TextBlock Text="Дополнительные настройки:" FontWeight="SemiBold"/>
+            <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" 
+                           Text="Разделитель:" 
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0"/>
+                <TextBox Grid.Column="1" 
+                         x:Name="SeparatorTextBox"
+                         Text="-"/>
+            </Grid>
+        </StackPanel>
+        
+        <!-- Результат импорта -->
+        <ScrollViewer Grid.Row="5" 
+                      VerticalScrollBarVisibility="Auto"
+                      Margin="0,0,0,10">
+            <TextBlock x:Name="ResultTextBlock" 
+                       Text="Выберите файл и нажмите 'Импортировать'"
                        TextWrapping="Wrap"/>
-        </Border>
-
+        </ScrollViewer>
+        
         <!-- Кнопки -->
-        <StackPanel Grid.Row="5" 
+        <StackPanel Grid.Row="6" 
                     Orientation="Horizontal" 
                     HorizontalAlignment="Right">
-            <Button Content="{Binding ImportDialogCancel}" 
+            <Button Content="Отмена" 
                     Click="OnCancelClick"
-                    Margin="0,0,10,0"
-                    MinWidth="80"/>
-            <Button Content="{Binding ImportDialogImport}" 
+                    Margin="0,0,10,0"/>
+            <Button Content="Импортировать" 
                     Click="OnImportClick"
-                    IsEnabled="{Binding IsImporting, Converter={x:Static BoolConverters.Not}}"
-                    Classes="primary"
-                    MinWidth="80"/>
+                    x:Name="ImportButton"/>
         </StackPanel>
     </Grid>
-
 </Window> 

@@ -1,141 +1,129 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
-using QuickMind.ViewModels;
+using QuickMind.Services;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace QuickMind.Views
 {
     public partial class ImportDialog : Window
     {
-        private ImportDialogViewModel? _viewModel;
-
-        public ImportDialog()
+        private readonly AnkiImportService _importService;
+        
+        public ImportDialog(AnkiImportService importService)
         {
             InitializeComponent();
+            _importService = importService;
+            
+            // Подписываемся на изменения в полях для активации кнопки
+            FilePathTextBox.TextChanged += UpdateImportButtonState;
+            TopicTextBox.TextChanged += UpdateImportButtonState;
+            
+            // Устанавливаем начальное состояние кнопки
+            UpdateImportButtonState(null, null);
         }
-
-        public ImportDialog(ImportDialogViewModel viewModel) : this()
+        
+        private void UpdateImportButtonState(object? sender, EventArgs? e)
         {
-            _viewModel = viewModel;
-            DataContext = viewModel;
+            ImportButton.IsEnabled = !string.IsNullOrEmpty(FilePathTextBox.Text) && 
+                                   !string.IsNullOrEmpty(TopicTextBox.Text?.Trim());
         }
-
-        private async void OnSelectFileClick(object sender, RoutedEventArgs e)
+        
+        private async void OnBrowseClick(object sender, RoutedEventArgs e)
         {
-            if (_viewModel == null) return;
-
-            var options = new FilePickerOpenOptions
+            var dialog = new OpenFileDialog
             {
-                Title = "Выберите файл с карточками",
-                AllowMultiple = false,
-                FileTypeFilter = new List<FilePickerFileType>
-                {
-                    new FilePickerFileType("Текстовые файлы") { Patterns = new[] { "*.txt", "*.csv" } },
-                    new FilePickerFileType("Все файлы") { Patterns = new[] { "*.*" } }
-                }
+                Title = "Выберите файл для импорта",
+                AllowMultiple = false
             };
-
-            var result = await StorageProvider.OpenFilePickerAsync(options);
-            if (result.Count > 0)
+            
+            // Устанавливаем фильтры в зависимости от выбранного формата
+            var formatIndex = FormatComboBox.SelectedIndex;
+            switch (formatIndex)
             {
-                _viewModel.SelectedFilePath = result[0].Path.LocalPath;
+                case 0: // CSV
+                    dialog.Filters.Add(new FileDialogFilter { Name = "CSV файлы", Extensions = { "csv" } });
+                    break;
+                case 1: // Текстовый
+                    dialog.Filters.Add(new FileDialogFilter { Name = "Текстовые файлы", Extensions = { "txt" } });
+                    break;
+                case 2: // JSON
+                    dialog.Filters.Add(new FileDialogFilter { Name = "JSON файлы", Extensions = { "json" } });
+                    break;
+                case 3: // APKG
+                    dialog.Filters.Add(new FileDialogFilter { Name = "Anki пакеты", Extensions = { "apkg" } });
+                    break;
+            }
+            
+            dialog.Filters.Add(new FileDialogFilter { Name = "Все файлы", Extensions = { "*" } });
+            
+            var result = await dialog.ShowAsync(this);
+            if (result != null && result.Length > 0)
+            {
+                FilePathTextBox.Text = result[0];
             }
         }
-
-        private void OnCancelClick(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
+        
         private async void OnImportClick(object sender, RoutedEventArgs e)
         {
-            if (_viewModel == null) return;
-
-            if (string.IsNullOrEmpty(_viewModel.SelectedFilePath))
+            if (string.IsNullOrEmpty(FilePathTextBox.Text))
+                return;
+                
+            if (!File.Exists(FilePathTextBox.Text))
             {
-                await ShowMessageAsync("Ошибка", "Выберите файл для импорта");
+                ResultTextBlock.Text = "Ошибка: Файл не найден";
                 return;
             }
-
-            if (string.IsNullOrEmpty(_viewModel.SelectedTopic))
+            
+            var topicName = TopicTextBox.Text?.Trim();
+            if (string.IsNullOrEmpty(topicName))
             {
-                await ShowMessageAsync("Ошибка", "Введите название темы");
+                ResultTextBlock.Text = "Ошибка: Введите название темы";
                 return;
             }
-
-            if (!File.Exists(_viewModel.SelectedFilePath))
-            {
-                await ShowMessageAsync("Ошибка", "Файл не найден");
-                return;
-            }
-
+            
             try
             {
-                await _viewModel.ImportAsync();
+                ResultTextBlock.Text = "Импорт в процессе...";
                 
-                if (_viewModel.StatusMessage.Contains("Успешно"))
+                // Используем универсальный метод импорта с указанием темы
+                var result = await _importService.ImportFromFileAsync(FilePathTextBox.Text, topicName);
+                
+                if (result?.Success == true)
                 {
-                    await ShowMessageAsync("Успех", _viewModel.StatusMessage);
-                    Close();
+                    var message = $"Импорт завершен успешно!\n\nИмпортировано карточек: {result.ImportedCards}";
+                    
+                    if (result.Errors.Count > 0)
+                    {
+                        message += $"\n\nОшибки ({result.Errors.Count}):\n";
+                        foreach (var error in result.Errors.Take(5)) // Показываем только первые 5 ошибок
+                        {
+                            message += $"• {error}\n";
+                        }
+                        if (result.Errors.Count > 5)
+                        {
+                            message += $"• ... и еще {result.Errors.Count - 5} ошибок\n";
+                        }
+                    }
+                    
+                    ResultTextBlock.Text = message;
                 }
                 else
                 {
-                    await ShowMessageAsync("Ошибка", _viewModel.StatusMessage);
+                    ResultTextBlock.Text = $"Ошибка импорта: {result?.ErrorMessage ?? "Неизвестная ошибка"}";
                 }
             }
             catch (Exception ex)
             {
-                await ShowMessageAsync("Ошибка", $"Ошибка импорта: {ex.Message}");
+                ResultTextBlock.Text = $"Ошибка: {ex.Message}";
             }
         }
-
-        private async Task ShowMessageAsync(string title, string message)
+        
+        private void OnCancelClick(object sender, RoutedEventArgs e)
         {
-            var okButton = new Button
-            {
-                Content = "OK",
-                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
-                MinWidth = 80
-            };
-
-            var messageBox = new Window
-            {
-                Title = title,
-                Width = 400,
-                Height = 200,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(30, 30, 30)),
-                Content = new Grid
-                {
-                    Margin = new Avalonia.Thickness(20),
-                    Children =
-                    {
-                        new StackPanel
-                        {
-                            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                            Children =
-                            {
-                                new TextBlock
-                                {
-                                    Text = message,
-                                    Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(255, 255, 255)),
-                                    TextWrapping = Avalonia.Media.TextWrapping.Wrap,
-                                    Margin = new Avalonia.Thickness(0, 0, 0, 20)
-                                },
-                                okButton
-                            }
-                        }
-                    }
-                }
-            };
-
-            okButton.Click += (s, e) => messageBox.Close();
-
-            await messageBox.ShowDialog(this);
+            Close();
         }
     }
 }

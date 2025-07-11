@@ -210,7 +210,11 @@ namespace QuickMind.Services
                 { "ImportDialogFormatTxt", "• TXT files: question[Tab]answer" },
                 { "ImportDialogFormatCsv", "• CSV files: question,answer" },
                 { "ImportDialogFormatEachLine", "• Each card on a new line" },
-                { "ImportDialogCancel", "Cancel" }
+                { "ImportDialogCancel", "Cancel" },
+                { "Again", "Again" },
+                { "Hard", "Hard" },
+                { "Good", "Good" },
+                { "Easy", "Easy" }
             };
         }
 
@@ -271,7 +275,11 @@ namespace QuickMind.Services
                 { "ImportDialogFormatTxt", "• TXT файлы: вопрос[Tab]ответ" },
                 { "ImportDialogFormatCsv", "• CSV файлы: вопрос,ответ" },
                 { "ImportDialogFormatEachLine", "• Каждая карточка на новой строке" },
-                { "ImportDialogCancel", "Отмена" }
+                { "ImportDialogCancel", "Отмена" },
+                { "Again", "Снова" },
+                { "Hard", "Сложно" },
+                { "Good", "Хорошо" },
+                { "Easy", "Легко" }
             };
         }
 
@@ -332,7 +340,11 @@ namespace QuickMind.Services
                 { "ImportDialogFormatTxt", "• TXT 文件: 问题[Tab]答案" },
                 { "ImportDialogFormatCsv", "• CSV 文件: 问题,答案" },
                 { "ImportDialogFormatEachLine", "• 每张卡片一行" },
-                { "ImportDialogCancel", "取消" }
+                { "ImportDialogCancel", "取消" },
+                { "Again", "重来" },
+                { "Hard", "困难" },
+                { "Good", "良好" },
+                { "Easy", "简单" }
             };
         }
 

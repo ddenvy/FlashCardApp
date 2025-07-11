@@ -12,6 +12,8 @@ namespace QuickMind.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly CardService _cardService;
+    private readonly SpacedRepetitionService _srsService;
+    private readonly AnkiImportService _importService;
     private readonly LocalizationService _localizationService;
     private ObservableCollection<FlashCard> _allCards;
     private ObservableCollection<string> _topics;
@@ -26,6 +28,30 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         _cardService = new CardService();
+        _srsService = new SpacedRepetitionService(_cardService);
+        _importService = new AnkiImportService(_cardService);
+        _localizationService = LocalizationService.Instance;
+        _allCards = new ObservableCollection<FlashCard>();
+        _topics = new ObservableCollection<string>();
+        _newCards = new ObservableCollection<FlashCard>();
+        _learningCards = new ObservableCollection<FlashCard>();
+        _knownCards = new ObservableCollection<FlashCard>();
+        
+        _currentLanguage = _localizationService.AvailableLanguages.FirstOrDefault(l => l.Code == _localizationService.CurrentCulture.Name) 
+                          ?? _localizationService.AvailableLanguages.First();
+        _localizationService.LanguageChanged += OnLanguageChanged;
+        
+        _cardService.CardsChanged += OnCardsChanged;
+        
+        InitializeCommands();
+        _ = LoadDataAsync();
+    }
+
+    public MainWindowViewModel(CardService cardService, SpacedRepetitionService srsService, AnkiImportService importService)
+    {
+        _cardService = cardService;
+        _srsService = srsService;
+        _importService = importService;
         _localizationService = LocalizationService.Instance;
         _allCards = new ObservableCollection<FlashCard>();
         _topics = new ObservableCollection<string>();
@@ -179,7 +205,7 @@ public partial class MainWindowViewModel : ViewModelBase
         DeleteTopicCommand = new RelayCommand(async () => await DeleteTopicAsync());
         MoveToNewCommand = new RelayCommand<FlashCard>(async (card) => await MoveCardToStatusAsync(card, CardStatus.New));
         MoveToLearningCommand = new RelayCommand<FlashCard>(async (card) => await MoveCardToStatusAsync(card, CardStatus.Learning));
-        MoveToKnownCommand = new RelayCommand<FlashCard>(async (card) => await MoveCardToStatusAsync(card, CardStatus.Known));
+        MoveToKnownCommand = new RelayCommand<FlashCard>(async (card) => await MoveCardToStatusAsync(card, CardStatus.Review));
     }
 
     private async Task LoadDataAsync()
@@ -198,8 +224,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
             var topics = await _cardService.GetAllTopicsAsync();
             
-            var currentSelectedTopic = SelectedTopic;
-            
             Topics.Clear();
             var allTopicsString = _localizationService.GetString("All");
             Topics.Add(allTopicsString);
@@ -207,59 +231,59 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 Topics.Add(topic);
             }
-            
-            if (!string.IsNullOrEmpty(currentSelectedTopic) && Topics.Contains(currentSelectedTopic))
-            {
-                SelectedTopic = currentSelectedTopic;
-            }
-            else
-            {
-                SelectedTopic = allTopicsString;
-            }
 
             UpdateGroupedCards();
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error in LoadDataAsync: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error loading data: {ex.Message}");
         }
     }
 
     private void FilterCards()
     {
+        var filteredCards = AllCards.Where(FilterCard).ToList();
+        
+        AllCards.Clear();
+        foreach (var card in filteredCards)
+        {
+            AllCards.Add(card);
+        }
+        
         UpdateGroupedCards();
     }
 
     private void UpdateGroupedCards()
     {
-        var filteredCards = AllCards.Where(FilterCard).ToList();
-        
         _newCards.Clear();
-        foreach (var card in filteredCards.Where(c => c.Status == CardStatus.New))
-        {
-            _newCards.Add(card);
-        }
-
         _learningCards.Clear();
-        foreach (var card in filteredCards.Where(c => c.Status == CardStatus.Learning))
-        {
-            _learningCards.Add(card);
-        }
-
         _knownCards.Clear();
-        foreach (var card in filteredCards.Where(c => c.Status == CardStatus.Known))
+
+        foreach (var card in AllCards)
         {
-            _knownCards.Add(card);
+            switch (card.Status)
+            {
+                case CardStatus.New:
+                    _newCards.Add(card);
+                    break;
+                case CardStatus.Learning:
+                case CardStatus.Relearning:
+                    _learningCards.Add(card);
+                    break;
+                case CardStatus.Review:
+                    _knownCards.Add(card);
+                    break;
+            }
         }
     }
 
     private bool FilterCard(FlashCard card)
     {
         var allTopicsString = _localizationService.GetString("All");
-        bool topicMatch = SelectedTopic == allTopicsString || card.Topic == SelectedTopic;
-        bool statusMatch = SelectedStatus == null || card.Status == SelectedStatus;
+        var topicMatches = SelectedTopic == allTopicsString || card.Topic == SelectedTopic;
+        var statusMatches = SelectedStatus == null || card.Status == SelectedStatus;
         
-        return topicMatch && statusMatch;
+        return topicMatches && statusMatches;
     }
 
     private void AddCardAsync()
@@ -336,7 +360,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 studyTopic = SelectedTopic;
             }
 
-            var viewModel = new StudyModeViewModel(_cardService, studyTopic);
+            var viewModel = new StudyModeViewModel(_cardService, _srsService, studyTopic);
             var studyWindow = new Views.StudyModeWindow(viewModel);
             
             studyWindow.Show();
@@ -364,10 +388,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         try
         {
-            var importService = new ImportService(_cardService);
-            var viewModel = new ImportDialogViewModel(importService);
-            var dialog = new Views.ImportDialog(viewModel);
-            
+            var dialog = new Views.ImportDialog(_importService);
             dialog.Show();
             
             dialog.Closed += async (s, e) =>
@@ -388,12 +409,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         try
         {
-            using var context = new FlashCardContext();
-            var cards = context.FlashCards.Where(c => c.Topic == SelectedTopic).ToList();
-            if (cards.Count == 0)
-                return;
-            context.FlashCards.RemoveRange(cards);
-            await context.SaveChangesAsync();
+            await _cardService.DeleteCardsByTopicAsync(SelectedTopic);
             await LoadDataAsync();
         }
         catch (Exception ex)

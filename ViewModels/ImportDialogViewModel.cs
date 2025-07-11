@@ -10,16 +10,18 @@ namespace QuickMind.ViewModels
 {
     public class ImportDialogViewModel : ViewModelBase
     {
-        private readonly ImportService _importService;
+        private readonly AnkiImportService _ankiImportService;
+        private readonly CardService _cardService;
         private string _selectedFilePath = string.Empty;
         private string _selectedTopic = string.Empty;
         private string _statusMessage = string.Empty;
         private bool _isImporting = false;
         private ObservableCollection<string> _existingTopics;
 
-        public ImportDialogViewModel(ImportService importService)
+        public ImportDialogViewModel(AnkiImportService ankiImportService, CardService cardService)
         {
-            _importService = importService;
+            _ankiImportService = ankiImportService;
+            _cardService = cardService;
             _existingTopics = new ObservableCollection<string>();
             
             InitializeCommands();
@@ -84,8 +86,7 @@ namespace QuickMind.ViewModels
         {
             try
             {
-                var cardService = new CardService();
-                var topics = await cardService.GetAllTopicsAsync();
+                var topics = await _cardService.GetAllTopicsAsync();
                 
                 ExistingTopics.Clear();
                 foreach (var topic in topics)
@@ -102,7 +103,7 @@ namespace QuickMind.ViewModels
         private void SelectFile()
         {
             // Этот метод будет вызван из code-behind
-            StatusMessage = "Выберите файл с карточками (формат: вопрос\tответ)";
+            StatusMessage = "Выберите файл с карточками (поддерживаются .json, .csv, .txt, .apkg)";
         }
 
         public async Task ImportAsync()
@@ -130,23 +131,13 @@ namespace QuickMind.ViewModels
 
             try
             {
-                ImportResult result;
-                
-                if (Path.GetExtension(SelectedFilePath).ToLower() == ".csv")
-                {
-                    result = await _importService.ImportFromCsvAsync(SelectedFilePath, SelectedTopic);
-                }
-                else
-                {
-                    result = await _importService.ImportFromFileAsync(SelectedFilePath, SelectedTopic);
-                }
-
-                StatusMessage = result.Message;
+                var result = await _ankiImportService.ImportFromFileAsync(SelectedFilePath, SelectedTopic);
+                StatusMessage = result.Success ? $"Импортировано {result.ImportedCards} карточек" : result.ErrorMessage ?? "Ошибка импорта";
                 
                 if (result.Success)
                 {
-                    // Закрыть диалог
-                    // В реальном приложении нужно вызвать событие закрытия
+                    // Обновляем список тем
+                    LoadExistingTopics();
                 }
             }
             catch (Exception ex)

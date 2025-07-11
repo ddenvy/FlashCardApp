@@ -11,6 +11,7 @@ namespace QuickMind.ViewModels
     public class StudyModeViewModel : ViewModelBase
     {
         private readonly CardService _cardService;
+        private readonly SpacedRepetitionService _srsService;
         private readonly LocalizationService _localizationService;
         private List<FlashCard> _studyCards;
         private int _currentIndex;
@@ -18,9 +19,10 @@ namespace QuickMind.ViewModels
         private bool _showAnswer;
         private string _studyTopic;
 
-        public StudyModeViewModel(CardService cardService, string? topic = null)
+        public StudyModeViewModel(CardService cardService, SpacedRepetitionService srsService, string? topic = null)
         {
             _cardService = cardService;
+            _srsService = srsService;
             _localizationService = LocalizationService.Instance;
             _studyTopic = topic ?? _localizationService.GetString("All");
             _studyCards = new List<FlashCard>();
@@ -80,6 +82,10 @@ namespace QuickMind.ViewModels
         public string AddCardsLabel => _localizationService.GetString("AddCardsOrSelectTopic");
         public string ClickToShowAnswerLabel => _localizationService.GetString("ClickToShowAnswer");
         public string RateKnowledgeLabel => _localizationService.GetString("RateKnowledge");
+        public string AgainLabel => _localizationService.GetString("Again") ?? "Снова";
+        public string HardLabel => _localizationService.GetString("Hard") ?? "Сложно";
+        public string GoodLabel => _localizationService.GetString("Good") ?? "Хорошо";
+        public string EasyLabel => _localizationService.GetString("Easy") ?? "Легко";
 
         public ICommand ShowAnswerCommand { get; private set; } = null!;
         public ICommand KnowCommand { get; private set; } = null!;
@@ -87,6 +93,10 @@ namespace QuickMind.ViewModels
         public ICommand NextCardCommand { get; private set; } = null!;
         public ICommand PreviousCardCommand { get; private set; } = null!;
         public ICommand RestartCommand { get; private set; } = null!;
+        public ICommand AgainCommand { get; private set; } = null!;
+        public ICommand HardCommand { get; private set; } = null!;
+        public ICommand GoodCommand { get; private set; } = null!;
+        public ICommand EasyCommand { get; private set; } = null!;
 
         public event Action? RequestClose;
 
@@ -98,6 +108,10 @@ namespace QuickMind.ViewModels
             NextCardCommand = new RelayCommand(NextCard, () => CanGoNext);
             PreviousCardCommand = new RelayCommand(PreviousCard, () => CanGoPrevious);
             RestartCommand = new RelayCommand(Restart);
+            AgainCommand = new RelayCommand(async () => await RateCardAsync(0));
+            HardCommand = new RelayCommand(async () => await RateCardAsync(1));
+            GoodCommand = new RelayCommand(async () => await RateCardAsync(2));
+            EasyCommand = new RelayCommand(async () => await RateCardAsync(3));
         }
 
         private async Task LoadStudyCardsAsync()
@@ -109,16 +123,20 @@ namespace QuickMind.ViewModels
                 var allTopicsString = _localizationService.GetString("All");
                 if (_studyTopic == allTopicsString || string.IsNullOrEmpty(_studyTopic))
                 {
-                    allCards = await _cardService.GetAllCardsAsync();
+                    // Временно используем все карточки для тестирования
+                    allCards = await _srsService.GetAllCardsForStudyAsync();
                 }
                 else
                 {
                     allCards = await _cardService.GetCardsByTopicAsync(_studyTopic);
+                    var allStudyCards = await _srsService.GetAllCardsForStudyAsync();
+                    var studyCardIds = allStudyCards.Select(c => c.Id).ToHashSet();
+                    allCards = allCards.Where(c => studyCardIds.Contains(c.Id)).ToList();
                 }
 
                 _studyCards = allCards
-                    .OrderBy(c => c.Status == CardStatus.Known ? 1 : 0)
-                    .ThenBy(c => c.LastViewedAt ?? DateTime.MinValue)
+                    .OrderBy(c => c.Type)
+                    .ThenBy(c => c.LearningDueDate ?? c.DueDate)
                     .ToList();
 
                 if (_studyCards.Any())
@@ -146,8 +164,8 @@ namespace QuickMind.ViewModels
         {
             if (CurrentCard != null)
             {
-                await _cardService.UpdateCardStatusAsync(CurrentCard.Id, CardStatus.Known);
-                CurrentCard.Status = CardStatus.Known;
+                await _cardService.UpdateCardStatusAsync(CurrentCard.Id, CardStatus.Review);
+                CurrentCard.Status = CardStatus.Review;
                 NextCard();
             }
         }
@@ -162,6 +180,23 @@ namespace QuickMind.ViewModels
             }
         }
 
+        private async Task RateCardAsync(int quality)
+        {
+            if (CurrentCard != null)
+            {
+                await _srsService.ApplyResultAsync(CurrentCard, quality);
+                
+                if (CurrentIndex == TotalCards - 1)
+                {
+                    RequestClose?.Invoke();
+                }
+                else
+                {
+                    NextCard();
+                }
+            }
+        }
+
         private void NextCard()
         {
             if (CanGoNext)
@@ -172,13 +207,6 @@ namespace QuickMind.ViewModels
                 OnPropertyChanged(nameof(Progress));
                 OnPropertyChanged(nameof(CanGoNext));
                 OnPropertyChanged(nameof(CanGoPrevious));
-                
-                ((RelayCommand)NextCardCommand).RaiseCanExecuteChanged();
-                ((RelayCommand)PreviousCardCommand).RaiseCanExecuteChanged();
-            }
-            else if (CurrentIndex == TotalCards - 1)
-            {
-                System.Diagnostics.Debug.WriteLine("Study session completed!");
             }
         }
 
@@ -192,9 +220,6 @@ namespace QuickMind.ViewModels
                 OnPropertyChanged(nameof(Progress));
                 OnPropertyChanged(nameof(CanGoNext));
                 OnPropertyChanged(nameof(CanGoPrevious));
-                
-                ((RelayCommand)NextCardCommand).RaiseCanExecuteChanged();
-                ((RelayCommand)PreviousCardCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -208,9 +233,6 @@ namespace QuickMind.ViewModels
                 OnPropertyChanged(nameof(Progress));
                 OnPropertyChanged(nameof(CanGoNext));
                 OnPropertyChanged(nameof(CanGoPrevious));
-                
-                ((RelayCommand)NextCardCommand).RaiseCanExecuteChanged();
-                ((RelayCommand)PreviousCardCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -229,6 +251,10 @@ namespace QuickMind.ViewModels
             OnPropertyChanged(nameof(AddCardsLabel));
             OnPropertyChanged(nameof(ClickToShowAnswerLabel));
             OnPropertyChanged(nameof(RateKnowledgeLabel));
+            OnPropertyChanged(nameof(AgainLabel));
+            OnPropertyChanged(nameof(HardLabel));
+            OnPropertyChanged(nameof(GoodLabel));
+            OnPropertyChanged(nameof(EasyLabel));
         }
 
         protected override void Dispose(bool disposing)
