@@ -3,11 +3,18 @@
 <div align="center">
   <img src="Assets/QuickMindLogo.png" alt="QuickMind Logo" width="120" height="120">
   
-  **A modern, minimalist flashcard application for efficient learning**
+  **Advanced flashcard application with spaced repetition algorithm for efficient learning**
   
   [![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/)
   [![Avalonia UI](https://img.shields.io/badge/Avalonia%20UI-11.0-blue.svg)](https://avaloniaui.net/)
   [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.txt)
+</div>
+
+## 📸 Application Screenshot
+
+<div align="center">
+  <img src="Assets/demo.png" alt="QuickMind Demo" width="800">
+  <p><em>QuickMind main interface with kanban board for card management</em></p>
 </div>
 
 ## 📥 Download
@@ -20,11 +27,11 @@ Ready to start learning? Download QuickMind for your platform:
   [![macOS Download](https://img.shields.io/badge/macOS-Download-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/ddenvy/QuickMind/releases/latest)
   [![Linux Download](https://img.shields.io/badge/Linux-Download-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/ddenvy/QuickMind/releases/latest)
   
-  **Windows**: `QuickMind-Setup-v2.1.2.exe` (34.15 MB)  
+  **Windows**: `QuickMind-Setup-v2.2.0.exe` (34.2 MB)  
   **macOS**: DMG files for Intel & Apple Silicon (45 MB)
   **Linux**: Multiple package formats available (35-50 MB)
   
-  *Latest version: v2.1.2*
+  *Latest version: v2.2.0*
   
 </div>
 
@@ -46,23 +53,55 @@ Ready to start learning? Download QuickMind for your platform:
 
 ## ✨ Features
 
-- **📚 Smart Flashcard System** - Organize your learning with three card states: New, Learning, and Known
-- **🎯 Study Mode** - Interactive learning experience with progress tracking
-- **🌍 Multi-language Support** - English, Russian, and Chinese interface
-- **🈯 Localized tooltips for card move/return buttons** - All tooltips for moving cards between columns are now fully localized and automatically change with the interface language
-- **🎨 Dark Minimalist Design** - Clean, distraction-free interface inspired by modern learning platforms
-- **📝 Easy Card Management** - Add, edit, and delete flashcards with live preview
-- **🏷️ Topic Organization** - Group cards by subjects or topics
-- **⚡ Cross-platform** - Available for Windows, macOS, and Linux (DEB, RPM, AppImage, Flatpak, Snap)
+### 🎯 Advanced Spaced Repetition Algorithm
+- **SM-2+ Algorithm** - Enhanced version of the classic SuperMemo algorithm
+- **Multi-step Learning** - New cards progress through multiple learning steps
+- **Relearning Process** - Forgotten cards automatically return to learning cycle
+- **Leech Detection** - Automatic identification and suspension of problematic cards
+- **Interval Fuzzing** - Random interval adjustment to prevent card clustering
+- **Flexible Settings** - Customize algorithm parameters to match your learning style
+
+### 📊 Smart Rating System
+- **4-point Scale**: Again / Hard / Good / Easy
+- **Color-coded Buttons** - Intuitive colors for each rating level
+- **Adaptive Intervals** - Review intervals automatically adjust based on your ratings
+
+### 📈 Comprehensive Statistics
+- **Daily Statistics** - Cards due today, studied, and forgotten
+- **Topic Progress** - Track success in each subject area
+- **Learning History** - Detailed statistics for all study sessions
+- **Difficulty Analysis** - Identify your most challenging cards
+
+### 📥 Import from Anki and Other Sources
+- **Anki JSON** - Import exported decks from Anki
+- **CSV Files** - Import from Excel/Google Sheets
+- **Text Files** - Import with customizable separators
+- **APKG Support** - Planned for future versions
+
+### 🎨 Modern Interface
+- **Kanban Board** - Visual card management by status
+- **Dark Theme** - Minimalist design for comfortable learning
+- **Responsive Layout** - Optimized for different screen sizes
+- **Smooth Animations** - Fluid transitions between states
+
+### 🌍 Multi-language Support
+- **3 Interface Languages**: English, Russian, Chinese
+- **Localized Tooltips** - All UI elements fully translated
+- **Instant Switching** - Interface adapts immediately to selected language
+
+### 🏷️ Topic Management
+- **Organization by Topics** - Group cards by subjects
+- **Topic Deletion** - Remove entire topics with their cards
+- **Topic Statistics** - Separate statistics for each topic
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### System Requirements
 
 - [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later
 - Git (for cloning the repository)
 
-### Installation
+### Installation from Source
 
 1. **Clone the repository**
    ```bash
@@ -96,11 +135,11 @@ Replace `win-x64` with your target platform:
 
 #### Automated Installers
 
-QuickMind includes GitHub Actions workflows for automatic installer creation:
+QuickMind includes scripts for automatic installer creation:
 
 **Windows Installer (Inno Setup)**
 ```bash
-./installer/Build-Windows-Installer.ps1 -Version "2.1.0"
+./installer/Build-Windows-Installer.ps1 -Version "2.2.0"
 ```
 
 **macOS DMG (Intel + Apple Silicon)**
@@ -108,36 +147,10 @@ QuickMind includes GitHub Actions workflows for automatic installer creation:
 ./installer/Build-macOS-Installer.sh
 ```
 
-**Linux Packages (via GitHub Actions)**
-- DEB packages for Debian/Ubuntu
-- RPM packages for Red Hat/Fedora/openSUSE  
-- AppImage for universal compatibility
-- Flatpak and Snap packages
-- Source packages for Arch Linux and Gentoo
-
 **All Platforms**
 ```bash
-./installer/Build-All.ps1 -Version "2.1.0"
+./installer/Build-All.ps1 -Version "2.2.0"
 ```
-
-#### GitHub Actions
-
-For automatic releases, simply create and push a version tag:
-
-```bash
-git tag v2.1.0
-git push origin v2.1.0
-```
-
-This will trigger GitHub Actions to:
-- Build Windows installer (.exe)
-- Build macOS DMG files (Intel + Apple Silicon)
-- Build Linux packages (DEB, RPM, AppImage, Flatpak, Snap)
-- Create source packages for Arch Linux and Gentoo
-- Create a GitHub Release with all files
-- Generate release notes automatically
-
-See [.github/WORKFLOWS.md](.github/WORKFLOWS.md) for detailed workflow documentation.
 
 ## 📖 How to Use
 
@@ -156,12 +169,21 @@ See [.github/WORKFLOWS.md](.github/WORKFLOWS.md) for detailed workflow documenta
 2. Read the question and try to recall the answer
 3. Click **"Show Answer"** to reveal the correct answer
 4. Rate your knowledge:
-   - **"Don't Know"** - moves card back to learning pile
-   - **"Know"** - moves card to known pile
+   - **"Again"** (red) - don't remember, need to review soon
+   - **"Hard"** (orange) - remember with difficulty, interval increases slightly
+   - **"Good"** (green) - remember well, standard interval
+   - **"Easy"** (blue) - remember easily, maximum interval
+
+### Importing Cards
+1. Click **"Import"** in the main window
+2. Select file to import (JSON, CSV, TXT)
+3. Specify topic name for imported cards
+4. Configure import parameters if needed
+5. Click "Import" to add cards
 
 ### Card Management
 - **New Cards**: Recently added cards waiting to be studied
-- **Learning Cards**: Cards you're actively studying
+- **Learning Cards**: Cards in active learning process
 - **Known Cards**: Cards you've mastered
 
 ## 🛠️ Technology Stack
@@ -171,10 +193,11 @@ See [.github/WORKFLOWS.md](.github/WORKFLOWS.md) for detailed workflow documenta
 - **Architecture**: MVVM (Model-View-ViewModel)
 - **Database**: SQLite with Entity Framework Core
 - **Styling**: Custom dark theme with Corus font
+- **Dependency Injection**: Microsoft.Extensions.DependencyInjection
 
 ## 🎨 Design Philosophy
 
-QuickMind follows a minimalist design approach inspired by modern learning platforms like YouLearn:
+QuickMind follows a minimalist design approach inspired by modern learning platforms:
 
 - **Dark Theme**: Reduces eye strain during long study sessions
 - **Clean Typography**: Corus font for optimal readability
@@ -186,9 +209,12 @@ QuickMind follows a minimalist design approach inspired by modern learning platf
 ```
 QuickMind/
 ├── Assets/                 # Images and icons
-├── Converters/            # Value converters for data binding
 ├── Models/                # Data models and database context
 ├── Services/              # Business logic and services
+│   ├── CardService.cs     # Card management
+│   ├── SpacedRepetitionService.cs # Spaced repetition algorithm
+│   ├── AnkiImportService.cs # Import from external sources
+│   └── LocalizationService.cs # Multi-language support
 ├── ViewModels/            # MVVM view models
 ├── Views/                 # UI views and windows
 ├── App.axaml             # Application styles and resources
@@ -201,6 +227,16 @@ QuickMind/
 - 🇺🇸 **English** - Full support
 - 🇷🇺 **Russian** - Full support  
 - 🇨🇳 **Chinese** - Full support
+
+## 🔧 Algorithm Settings
+
+QuickMind offers flexible spaced repetition algorithm settings:
+
+- **Learning Steps**: Configure steps for new cards
+- **Graduating Interval**: Interval for cards transitioning to review
+- **Easy Interval**: Interval for cards rated as "Easy"
+- **Maximum Interval**: Limit on maximum review interval
+- **Leech Threshold**: Number of failures before card suspension
 
 ## 🤝 Contributing
 
@@ -227,6 +263,8 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 - [Avalonia UI](https://avaloniaui.net/) for the excellent cross-platform UI framework
 - [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/) for database management
+- [SuperMemo](https://supermemo.com/) for the SM-2 algorithm
+- [Anki](https://apps.ankiweb.net/) for inspiration in spaced repetition
 - The open-source community for inspiration and tools
 
 ## 📞 Support
@@ -240,7 +278,7 @@ If you encounter any issues or have questions:
 ---
 
 <div align="center">
-  Made with ❤️ for learners everywhere !
+  Made with ❤️ for learners everywhere!
   
   **Happy Learning! 🎓**
 </div> 

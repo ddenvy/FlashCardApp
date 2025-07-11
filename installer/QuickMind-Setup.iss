@@ -1,7 +1,7 @@
 ﻿[Setup]
 AppName=QuickMind
-AppVersion=2.1.2
-AppVerName=QuickMind v2.1.2
+AppVersion=2.2.0
+AppVerName=QuickMind v2.2.0
 AppPublisher=QuickMind
 AppPublisherURL=https://github.com/ddenvy/QuickMind
 AppSupportURL=https://github.com/ddenvy/QuickMind/issues
@@ -10,7 +10,7 @@ DefaultDirName={autopf}\QuickMind
 DisableProgramGroupPage=yes
 LicenseFile=..\LICENSE.txt
 OutputDir=..\dist
-OutputBaseFilename=QuickMind-Setup-v2.1.2
+OutputBaseFilename=QuickMind-Setup-v2.2.0
 SetupIconFile=..\Assets\avalonia-logo.ico
 Compression=lzma
 SolidCompression=yes
