@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="QuickMind.Views.ImportDialog"
-        Title="Импорт колоды"
+        Title="Импорт карточек"
         Width="500" Height="400"
         CanResize="False"
         WindowStartupLocation="CenterOwner">
@@ -19,26 +19,28 @@
         
         <!-- Заголовок -->
         <TextBlock Grid.Row="0" 
-                   Text="Импорт колоды из файла"
+                   x:Name="HeaderTextBlock"
+                   Text="Импорт карточек из файла"
                    FontSize="18" FontWeight="Bold"
                    Margin="0,0,0,20"/>
         
         <!-- Выбор формата -->
         <StackPanel Grid.Row="1" Margin="0,0,0,10">
-            <TextBlock Text="Формат файла:" FontWeight="SemiBold"/>
+            <TextBlock x:Name="FormatLabelTextBlock" Text="Формат файла:" FontWeight="SemiBold"/>
             <ComboBox x:Name="FormatComboBox" 
                       SelectedIndex="0"
                       Margin="0,5,0,0">
-                <ComboBoxItem Content="CSV файл (вопрос, ответ, тема)"/>
-                <ComboBoxItem Content="Текстовый файл (вопрос - ответ)"/>
-                <ComboBoxItem Content="JSON файл (экспорт Anki)"/>
-                <ComboBoxItem Content="APKG файл (пакет Anki)"/>
+                <ComboBoxItem x:Name="CsvFormatItem" Content="CSV (разделённые запятыми значения)"/>
+                <ComboBoxItem x:Name="XlsxFormatItem" Content="XLSX (Excel файл)"/>
+                <ComboBoxItem x:Name="TxtFormatItem" Content="TXT (вопрос-ответ)"/>
+                <ComboBoxItem x:Name="JsonFormatItem" Content="JSON (Anki экспорт)"/>
+                <ComboBoxItem x:Name="ApkgFormatItem" Content="APKG (Anki колода)"/>
             </ComboBox>
         </StackPanel>
         
         <!-- Выбор файла -->
         <StackPanel Grid.Row="2" Margin="0,0,0,10">
-            <TextBlock Text="Файл для импорта:" FontWeight="SemiBold"/>
+            <TextBlock x:Name="FileLabelTextBlock" Text="Файл:" FontWeight="SemiBold"/>
             <Grid Margin="0,5,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -47,8 +49,9 @@
                 <TextBox x:Name="FilePathTextBox" 
                          Grid.Column="0"
                          IsReadOnly="True"
-                         Watermark="Выберите файл для импорта"/>
-                <Button Grid.Column="1" 
+                         Watermark="Выберите файл..."/>
+                <Button x:Name="BrowseButtonControl"
+                        Grid.Column="1" 
                         Content="Обзор"
                         Margin="5,0,0,0"
                         Click="OnBrowseClick"/>
@@ -57,27 +60,32 @@
         
         <!-- Название темы -->
         <StackPanel Grid.Row="3" Margin="0,0,0,10">
-            <TextBlock Text="Название темы:" FontWeight="SemiBold"/>
+            <TextBlock x:Name="TopicLabelTextBlock" Text="Тема:" FontWeight="SemiBold"/>
             <TextBox x:Name="TopicTextBox" 
                      Margin="0,5,0,0"
-                     Watermark="Введите название темы для импортированных карточек"/>
+                     Watermark="Введите название темы..."/>
         </StackPanel>
         
         <!-- Дополнительные настройки -->
         <StackPanel Grid.Row="4" Margin="0,0,0,10">
-            <TextBlock Text="Дополнительные настройки:" FontWeight="SemiBold"/>
+            <TextBlock x:Name="SettingsLabelTextBlock" Text="Настройки:" FontWeight="SemiBold"/>
             <Grid Margin="0,5,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" 
-                           Text="Разделитель:" 
-                           VerticalAlignment="Center"
-                           Margin="0,0,10,0"/>
-                <TextBox Grid.Column="1" 
-                         x:Name="SeparatorTextBox"
-                         Text="-"/>
+                <!-- Подсказки -->
+                <StackPanel Grid.Column="0" Orientation="Vertical">
+                    <TextBlock x:Name="FormatTxtTextBlock" Text="TXT формат: вопрос-ответ"/>
+                    <TextBlock x:Name="FormatCsvTextBlock" Text="CSV формат: вопрос,ответ"/>
+                    <TextBlock x:Name="FormatXlsxTextBlock" Text="XLSX формат: вопрос,ответ"/>
+                    <TextBlock x:Name="FormatEachLineTextBlock" Text="Каждая строка - отдельная карточка"/>
+                </StackPanel>
+                <!-- Разделитель -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                    <TextBlock x:Name="SeparatorLabelTextBlock" Text="Разделитель:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBox x:Name="SeparatorTextBox" Text="-" Width="30"/>
+                </StackPanel>
             </Grid>
         </StackPanel>
         
@@ -94,12 +102,13 @@
         <StackPanel Grid.Row="6" 
                     Orientation="Horizontal" 
                     HorizontalAlignment="Right">
-            <Button Content="Отмена" 
+            <Button x:Name="CancelButtonControl"
+                    Content="Отмена" 
                     Click="OnCancelClick"
                     Margin="0,0,10,0"/>
-            <Button Content="Импортировать" 
-                    Click="OnImportClick"
-                    x:Name="ImportButton"/>
+            <Button x:Name="ImportButton"
+                    Content="Импортировать"
+                    Click="OnImportClick"/>
         </StackPanel>
     </Grid>
-</Window> 
+</Window>

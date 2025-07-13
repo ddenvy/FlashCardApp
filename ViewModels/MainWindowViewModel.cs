@@ -89,6 +89,9 @@ public partial class MainWindowViewModel : ViewModelBase
             if (SetProperty(ref _selectedTopic, value))
             {
                 FilterCards();
+                OnPropertyChanged(nameof(DeleteButtonLabel));
+                OnPropertyChanged(nameof(DeleteButtonTooltip));
+                OnPropertyChanged(nameof(IsAllTopicsSelected));
             }
         }
     }
@@ -144,6 +147,12 @@ public partial class MainWindowViewModel : ViewModelBase
     public string MoveToNewTooltip => _localizationService.GetString("MoveToNew");
     public string ImportLabel => _localizationService.GetString("Import");
     public string DeleteTopicLabel => _localizationService.GetString("DeleteTopic");
+    public string DeleteAllLabel => _localizationService.GetString("DeleteAll");
+    
+    public string DeleteButtonLabel => IsAllTopicsSelected ? DeleteAllLabel : DeleteTopicLabel;
+    public string DeleteButtonTooltip => IsAllTopicsSelected ? DeleteAllLabel : DeleteTopicLabel;
+    
+    public bool IsAllTopicsSelected => SelectedTopic == _localizationService.GetString("All");
 
     public ICommand AddCardCommand { get; private set; } = null!;
     public ICommand RefreshCommand { get; private set; } = null!;
@@ -406,7 +415,13 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var allTopicsString = _localizationService.GetString("All");
         if (SelectedTopic == allTopicsString)
-            return;
+        {
+            // Удаляем все карточки
+            await DeleteAllCardsAsync();
+        }
+        else
+        {
+            // Удаляем карточки определенной темы
         try
         {
             await _cardService.DeleteCardsByTopicAsync(SelectedTopic);
@@ -415,6 +430,20 @@ public partial class MainWindowViewModel : ViewModelBase
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error deleting topic: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task DeleteAllCardsAsync()
+    {            
+        try
+        {
+            await _cardService.DeleteAllCardsAsync();
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error deleting all cards: {ex.Message}");
         }
     }
 
@@ -435,6 +464,9 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(MoveToNewTooltip));
         OnPropertyChanged(nameof(ImportLabel));
         OnPropertyChanged(nameof(DeleteTopicLabel));
+        OnPropertyChanged(nameof(DeleteAllLabel));
+        OnPropertyChanged(nameof(DeleteButtonLabel));
+        OnPropertyChanged(nameof(DeleteButtonTooltip));
         
         var allTopicsString = _localizationService.GetString("All");
         

@@ -71,6 +71,7 @@ namespace QuickMind.ViewModels
         public string ImportDialogFormatHeader => LocalizationService.Instance.GetString("ImportDialogFormatHeader");
         public string ImportDialogFormatTxt => LocalizationService.Instance.GetString("ImportDialogFormatTxt");
         public string ImportDialogFormatCsv => LocalizationService.Instance.GetString("ImportDialogFormatCsv");
+        public string ImportDialogFormatXlsx => LocalizationService.Instance.GetString("ImportDialogFormatXlsx");
         public string ImportDialogFormatEachLine => LocalizationService.Instance.GetString("ImportDialogFormatEachLine");
         public string ImportDialogCancel => LocalizationService.Instance.GetString("ImportDialogCancel");
         public string ImportDialogImport => LocalizationService.Instance.GetString("Import");
@@ -120,6 +121,12 @@ namespace QuickMind.ViewModels
                 return;
             }
 
+            if (SelectedTopic.Length > 20)
+            {
+                StatusMessage = "Название темы должно быть не более 20 символов";
+                return;
+            }
+
             if (!File.Exists(SelectedFilePath))
             {
                 StatusMessage = "Файл не найден";
@@ -150,4 +157,4 @@ namespace QuickMind.ViewModels
             }
         }
     }
-} 
+}

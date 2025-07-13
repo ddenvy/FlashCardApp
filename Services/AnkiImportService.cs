@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml;
+using ClosedXML.Excel;
 
 namespace QuickMind.Services
 {
@@ -24,7 +25,6 @@ namespace QuickMind.Services
         public async Task<ImportResult> ImportFromFileAsync(string filePath, string? topicOverride = null)
         {
             var extension = Path.GetExtension(filePath).ToLower();
-            
             try
             {
                 ImportResult result = extension switch
@@ -33,6 +33,7 @@ namespace QuickMind.Services
                     ".json" => await ImportFromJsonAsync(filePath),
                     ".csv" => await ImportFromCsvAsync(filePath),
                     ".txt" => await ImportFromTextFileAsync(filePath),
+                    ".xlsx" => await ImportFromXlsxAsync(filePath),
                     _ => new ImportResult
                     {
                         Success = false,
@@ -62,6 +63,12 @@ namespace QuickMind.Services
         
         private async Task UpdateImportedCardsTopic(string newTopic)
         {
+            // Ограничиваем длину названия темы 20 символами
+            if (newTopic.Length > 20)
+            {
+                newTopic = newTopic.Substring(0, 20);
+            }
+            
             var recentCards = await _cardService.GetCardsByTopicAsync("Импортированные");
             foreach (var card in recentCards.Where(c => c.CreatedAt > DateTime.Now.AddMinutes(-5)))
             {
@@ -149,18 +156,19 @@ namespace QuickMind.Services
         
         /// <summary>
         /// Импортирует колоду из CSV файла (универсальный формат)
+        /// Формат: Первый столбец = Вопрос, Второй столбец = Ответ
         /// </summary>
         public async Task<ImportResult> ImportFromCsvAsync(string filePath, string delimiter = ",")
         {
             try
             {
                 var lines = await File.ReadAllLinesAsync(filePath);
-                if (lines.Length < 2) // Заголовок + хотя бы одна строка
+                if (lines.Length < 1)
                 {
                     return new ImportResult
                     {
                         Success = false,
-                        ErrorMessage = "Файл слишком короткий",
+                        ErrorMessage = "Файл пуст",
                         ImportedCards = 0
                     };
                 }
@@ -168,19 +176,37 @@ namespace QuickMind.Services
                 var importedCards = 0;
                 var errors = new List<string>();
                 
-                // Пропускаем заголовок
-                for (int i = 1; i < lines.Length; i++)
+                // Определяем, есть ли заголовок (если первая строка содержит "вопрос" или "question")
+                var startIndex = 0;
+                var firstLine = lines[0].ToLower();
+                if (firstLine.Contains("вопрос") || firstLine.Contains("question") || 
+                    firstLine.Contains("тема") || firstLine.Contains("topic") ||
+                    firstLine.Contains("карточка") || firstLine.Contains("card"))
+                {
+                    startIndex = 1; // Пропускаем заголовок
+                }
+                
+                // Импортируем данные
+                for (int i = startIndex; i < lines.Length; i++)
                 {
                     try
                     {
-                        var parts = lines[i].Split(delimiter);
+                        var line = lines[i].Trim();
+                        if (string.IsNullOrEmpty(line)) continue;
+                        
+                        var parts = line.Split(delimiter);
                         if (parts.Length >= 2)
                         {
+                            var question = parts[0].Trim().Trim('"').Trim('\'');
+                            var answer = parts[1].Trim().Trim('"').Trim('\'');
+                            
+                            if (!string.IsNullOrEmpty(question) && !string.IsNullOrEmpty(answer))
+                            {
                             var card = new FlashCard
                             {
-                                Question = parts[0].Trim('"'),
-                                Answer = parts[1].Trim('"'),
-                                Topic = parts.Length > 2 ? parts[2].Trim('"') : "Импортированные",
+                                    Question = question,   // Первый столбец = Вопрос
+                                    Answer = answer,       // Второй столбец = Ответ
+                                    Topic = "Импортированные",
                                 Type = CardType.New,
                                 Status = CardStatus.New,
                                 CreatedAt = DateTime.Now,
@@ -189,6 +215,15 @@ namespace QuickMind.Services
                             
                             await _cardService.AddCardAsync(card);
                             importedCards++;
+                            }
+                            else
+                            {
+                                errors.Add($"Строка {i + 1}: Пустой вопрос или ответ");
+                            }
+                        }
+                        else
+                        {
+                            errors.Add($"Строка {i + 1}: Недостаточно столбцов (нужно минимум 2)");
                         }
                     }
                     catch (Exception ex)
@@ -288,6 +323,88 @@ namespace QuickMind.Services
         }
         
         /// <summary>
+        /// Импортирует колоду из XLSX файла (Excel)
+        /// Формат: Первый столбец = Вопрос, Второй столбец = Ответ
+        /// </summary>
+        public async Task<ImportResult> ImportFromXlsxAsync(string filePath)
+        {
+            try
+            {
+                var importedCards = 0;
+                var errors = new List<string>();
+                
+                using var workbook = new XLWorkbook(filePath);
+                var worksheet = workbook.Worksheets.First();
+                
+                // Определяем, есть ли заголовок
+                var startRow = 1;
+                var firstRow = worksheet.FirstRowUsed();
+                if (firstRow != null)
+                {
+                    var cell1 = firstRow.Cell(1).GetString().ToLower();
+                    if (cell1.Contains("вопрос") || cell1.Contains("question") || 
+                        cell1.Contains("тема") || cell1.Contains("topic") ||
+                        cell1.Contains("карточка") || cell1.Contains("card"))
+                    {
+                        startRow = 2; // Пропускаем заголовок
+                    }
+                }
+                
+                // Импортируем данные
+                var rows = worksheet.RowsUsed().Skip(startRow - 1);
+                foreach (var row in rows)
+                {
+                    try
+                    {
+                        var question = row.Cell(1).GetString().Trim();
+                        var answer = row.Cell(2).GetString().Trim();
+                        
+                        if (!string.IsNullOrEmpty(question) && !string.IsNullOrEmpty(answer))
+                        {
+                            var card = new FlashCard
+                            {
+                                Question = question,   // Первый столбец = Вопрос
+                                Answer = answer,       // Второй столбец = Ответ
+                                Topic = "Импортированные",
+                                Type = CardType.New,
+                                Status = CardStatus.New,
+                                CreatedAt = DateTime.Now,
+                                DueDate = DateTime.Today
+                            };
+                            
+                            await _cardService.AddCardAsync(card);
+                            importedCards++;
+                        }
+                        else
+                        {
+                            errors.Add($"Строка {row.RowNumber()}: Пустой вопрос или ответ");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add($"Ошибка в строке {row.RowNumber()}: {ex.Message}");
+                    }
+                }
+                
+                return new ImportResult
+                {
+                    Success = true,
+                    ImportedCards = importedCards,
+                    Errors = errors
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ImportResult
+                {
+                    Success = false,
+                    ErrorMessage = ex.Message,
+                    ImportedCards = 0
+                };
+            }
+        }
+        
+        /// <summary>
         /// Конвертирует заметку Anki в карточку QuickMind
         /// </summary>
         private FlashCard ConvertAnkiNoteToFlashCard(AnkiNote note)
@@ -296,7 +413,7 @@ namespace QuickMind.Services
             {
                 Question = note.Fields[0], // Первое поле - вопрос
                 Answer = note.Fields[1],   // Второе поле - ответ
-                Topic = GetTopicFromTags(note.Tags),
+                Topic = "Импортированные", // Тема всегда задается пользователем, не из файла
                 Type = CardType.New,
                 Status = CardStatus.New,
                 CreatedAt = DateTimeOffset.FromUnixTimeSeconds(note.Created).DateTime,
@@ -307,26 +424,6 @@ namespace QuickMind.Services
             };
             
             return card;
-        }
-        
-        /// <summary>
-        /// Извлекает тему из тегов Anki
-        /// </summary>
-        private string GetTopicFromTags(string[] tags)
-        {
-            if (tags == null || tags.Length == 0)
-                return "Импортированные";
-            
-            // Ищем тег, который может быть темой
-            foreach (var tag in tags)
-            {
-                if (!string.IsNullOrEmpty(tag) && !tag.StartsWith("leech"))
-                {
-                    return tag;
-                }
-            }
-            
-            return "Импортированные";
         }
     }
     

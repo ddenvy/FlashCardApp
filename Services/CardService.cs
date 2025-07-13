@@ -183,6 +183,20 @@ namespace QuickMind.Services
         }
 
         /// <summary>
+        /// Удаляет все карточки из базы данных
+        /// </summary>
+        public async Task DeleteAllCardsAsync()
+        {
+            using var context = new FlashCardContext();
+            var allCards = await context.FlashCards.ToListAsync();
+            
+            context.FlashCards.RemoveRange(allCards);
+            await context.SaveChangesAsync();
+            
+            CardsChanged?.Invoke();
+        }
+
+        /// <summary>
         /// Получает статистику по карточкам
         /// </summary>
         public async Task<CardStatistics> GetStatisticsAsync()
